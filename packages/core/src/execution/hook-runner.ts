@@ -1,3 +1,10 @@
+// core/src/execution/hook-runner.ts
+//
+// GAP FILLED: Full hook surface (spec §3.2)
+//   Previous HookName type only had 4 hooks. Now covers all 11 lifecycle hooks.
+//   Added: onRegister, onBeforeCompose, onAfterTemplate, onMerge,
+//          onAfterCompose, onFinalize, onRollback
+
 import type { CompositionPlan } from "../types.js";
 import type { ModuleRegistry, ModuleSource } from "../module-registry/registry.js";
 import type { PluginDefinition, PluginHookContext } from "@foundation-cli/plugin-sdk";
@@ -25,17 +32,31 @@ export class HookExecutionError extends FoundationError {
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-export type HookName = "beforeWrite" | "afterWrite" | "beforeInstall" | "afterInstall";
+/**
+ * All lifecycle hook names (spec §3.2).
+ * Previously only had 4; now matches the full architecture spec.
+ */
+export type HookName =
+  | "onRegister"
+  | "onBeforeCompose"
+  | "onAfterTemplate"
+  | "onMerge"
+  | "onAfterCompose"
+  | "beforeWrite"
+  | "afterWrite"
+  | "beforeInstall"
+  | "afterInstall"
+  | "onFinalize"
+  | "onRollback";
 
 export interface HookRunnerOptions {
   /** If true, a failing hook throws HookExecutionError and halts the pipeline. */
   readonly strict?: boolean;
-  /** Receives notifications without UI coupling. */
-  readonly onHookStart?: ((moduleId: string, hookName: HookName) => void) | undefined;
+  readonly onHookStart?:    ((moduleId: string, hookName: HookName) => void) | undefined;
   readonly onHookComplete?: ((moduleId: string, hookName: HookName) => void) | undefined;
-  readonly onHookSkipped?: ((moduleId: string, hookName: HookName, reason: string) => void) | undefined;
+  readonly onHookSkipped?:  ((moduleId: string, hookName: HookName, reason: string) => void) | undefined;
   /** Sandbox execution timeout per hook in ms. Default: 5000. */
-  readonly sandboxTimeoutMs?: number;
+  readonly sandboxTimeoutMs?: number | undefined;
 }
 
 // ── Runner ────────────────────────────────────────────────────────────────────
@@ -43,14 +64,10 @@ export interface HookRunnerOptions {
 /**
  * Executes a single named hook for all ordered modules.
  *
- * Routing logic:
- *   - Module source = "builtin"  → direct function call (existing behaviour,
- *                                   zero performance overhead, unchanged).
- *   - Module source = "plugin"   → routed through vm.Script sandbox.
- *                                   Blocked modules (fs, net, child_process)
- *                                   throw SandboxBlockedModuleError.
+ * Routing:
+ *   source = "builtin" → direct function call (zero overhead).
+ *   source = "plugin"  → vm.Script sandbox (fs/net/child_process blocked).
  *
- * The hook interface (PluginHookContext) => Promise<void> is unchanged.
  * Callers do not need to know about the sandbox.
  */
 export async function runHooksForPlan(
@@ -75,18 +92,14 @@ export async function runHooksForPlan(
     }
 
     if (source === "plugin") {
-      // ── Sandboxed path ──────────────────────────────────────────────────
-      const pluginOptions: Parameters<typeof runPluginHookSandboxed>[4] = {
+      await runPluginHookSandboxed(manifest.id, hookName, plugin, ctx, {
         strict,
-        ...(onHookStart && { onHookStart }),
-        ...(onHookComplete && { onHookComplete }),
-        ...(onHookSkipped && { onHookSkipped }),
-        ...(sandboxTimeoutMs !== undefined && { sandboxTimeoutMs }),
-      };
-
-      await runPluginHookSandboxed(manifest.id, hookName, plugin, ctx, pluginOptions);
+        onHookStart,
+        onHookComplete,
+        onHookSkipped,
+        sandboxTimeoutMs,
+      });
     } else {
-      // ── Builtin path (unchanged) ────────────────────────────────────────
       await runBuiltinHook(manifest.id, hookName, plugin, ctx, {
         strict,
         onHookStart,
@@ -97,7 +110,29 @@ export async function runHooksForPlan(
   }
 }
 
-// ── Builtin hook execution (direct call) ──────────────────────────────────────
+// ── Standalone hook runner (for onRegister, onFinalize, onRollback) ───────────
+
+/**
+ * Runs a single hook on a single module definition.
+ * Used for hooks that are not tied to the CompositionPlan loop
+ * (e.g. onRegister at load time, onFinalize after success, onRollback on error).
+ */
+export async function runSingleHook(
+  hookName: HookName,
+  moduleId: string,
+  plugin: PluginDefinition,
+  source: ModuleSource,
+  ctx: PluginHookContext,
+  options: HookRunnerOptions = {},
+): Promise<void> {
+  if (source === "plugin") {
+    await runPluginHookSandboxed(moduleId, hookName, plugin, ctx, options);
+  } else {
+    await runBuiltinHook(moduleId, hookName, plugin, ctx, options);
+  }
+}
+
+// ── Builtin hook execution (direct function call) ─────────────────────────────
 
 async function runBuiltinHook(
   moduleId: string,
@@ -120,9 +155,7 @@ async function runBuiltinHook(
     await hook(ctx);
     onHookComplete?.(moduleId, hookName);
   } catch (err) {
-    if (strict) {
-      throw new HookExecutionError(moduleId, hookName, err);
-    }
+    if (strict) throw new HookExecutionError(moduleId, hookName, err);
     onHookSkipped?.(
       moduleId,
       hookName,
@@ -145,8 +178,6 @@ async function runPluginHookSandboxed(
 ): Promise<void> {
   const { strict, onHookStart, onHookComplete, onHookSkipped, sandboxTimeoutMs } = options;
 
-  // Hooks are stripped from plugin PluginDefinitions at registerPlugin time.
-  // Hook source code lives in plugin.sandboxedHooks (set by plugin-installer).
   const hookSource = resolveSandboxedHookSource(plugin, hookName);
 
   if (hookSource === undefined || isEmptyHookSource(hookSource)) {
@@ -157,17 +188,14 @@ async function runPluginHookSandboxed(
   onHookStart?.(moduleId, hookName);
 
   try {
-    const options = sandboxTimeoutMs !== undefined ? { timeoutMs: sandboxTimeoutMs } : {};
-    await executeSandboxedHook(moduleId, hookSource, ctx, options);
+    const sbOpts = sandboxTimeoutMs !== undefined ? { timeoutMs: sandboxTimeoutMs } : {};
+    await executeSandboxedHook(moduleId, hookSource, ctx, sbOpts);
     onHookComplete?.(moduleId, hookName);
   } catch (err) {
     const isSandboxViolation =
       err instanceof SandboxBlockedModuleError || err instanceof SandboxTimeoutError;
 
     if (strict || isSandboxViolation) {
-      // Sandbox violations always throw regardless of strict mode —
-      // a plugin attempting to access fs is a security event, not a
-      // routine failure.
       throw new HookExecutionError(moduleId, hookName, err);
     }
 
@@ -188,16 +216,10 @@ function resolveHook(
   return plugin.hooks?.[hookName];
 }
 
-/**
- * Reads the sandboxed hook source string from the PluginDefinition extension.
- * Plugin installer writes hook sources into `plugin.sandboxedHooks` when
- * storing the manifest — this avoids storing executable functions directly.
- */
 function resolveSandboxedHookSource(
   plugin: PluginDefinition,
   hookName: HookName,
 ): string | undefined {
-  // `sandboxedHooks` is a non-SDK extension stored on the definition object.
   const extended = plugin as PluginDefinition & {
     sandboxedHooks?: Partial<Record<HookName, string>>;
   };

@@ -24,23 +24,85 @@ import { fileURLToPath } from "node:url";
 import type { ModuleRegistry } from "@foundation-cli/core";
 import { ModuleLoader, type DiscoveryResult } from "@foundation-cli/core";
 
-import { nextjsModule }     from "./frontend/nextjs.js";
-import { expressModule }    from "./backend/express.js";
-import { postgresqlModule } from "./database/postgresql.js";
-import { jwtModule }        from "./auth/jwt.js";
-import { tailwindModule }   from "./ui/tailwind.js";
-import { dockerModule }     from "./deployment/docker.js";
+// Frontend
+import { nextjsModule }        from "./frontend/nextjs.js";
+import { reactViteModule }     from "./frontend/react-vite.js";
+import { vueModule }           from "./frontend/vue.js";
+import { svelteModule }        from "./frontend/svelte.js";
+// Backend
+import { expressModule }       from "./backend/express.js";
+import { nestjsModule }        from "./backend/nestjs.js";
+import { fastapiModule }       from "./backend/fastapi.js";
+import { djangoModule }        from "./backend/django.js";
+// Database
+import { postgresqlModule }    from "./database/postgresql.js";
+import { mysqlModule }         from "./database/mysql.js";
+import { mongodbModule }       from "./database/mongodb.js";
+import { sqliteModule }        from "./database/sqlite.js";
+import { supabaseModule }      from "./database/supabase.js";
+// Auth
+import { jwtModule }           from "./auth/jwt.js";
+import { oauthModule }         from "./auth/oauth.js";
+import { sessionModule }       from "./auth/session.js";
+import { clerkModule }         from "./auth/clerk.js";
+import { auth0Module }         from "./auth/auth0.js";
+// UI
+import { tailwindModule }      from "./ui/tailwind.js";
+import { shadcnModule }        from "./ui/shadcn.js";
+import { muiModule }           from "./ui/mui.js";
+import { chakraModule }        from "./ui/chakra.js";
+import { bootstrapModule }     from "./ui/bootstrap.js";
+// State
+import { zustandModule }       from "./state/zustand.js";
+import { reduxModule }         from "./state/redux.js";
+import { tanstackQueryModule } from "./state/tanstack-query.js";
+// Deployment
+import { dockerModule }        from "./deployment/docker.js";
+import { vercelModule }        from "./deployment/vercel.js";
+import { renderModule }        from "./deployment/render.js";
+import { awsModule }           from "./deployment/aws.js";
 
 // ── Static registration ────────────────────────────────────────────────────────
 
 /** All built-in PluginDefinitions in the order they should be registered. */
 const BUILTIN_MODULES = [
+  // Frontend
   nextjsModule,
+  reactViteModule,
+  vueModule,
+  svelteModule,
+  // Backend
   expressModule,
+  nestjsModule,
+  fastapiModule,
+  djangoModule,
+  // Database
   postgresqlModule,
+  mysqlModule,
+  mongodbModule,
+  sqliteModule,
+  supabaseModule,
+  // Auth
   jwtModule,
+  oauthModule,
+  sessionModule,
+  clerkModule,
+  auth0Module,
+  // UI
   tailwindModule,
+  shadcnModule,
+  muiModule,
+  chakraModule,
+  bootstrapModule,
+  // State
+  zustandModule,
+  reduxModule,
+  tanstackQueryModule,
+  // Deployment
   dockerModule,
+  vercelModule,
+  renderModule,
+  awsModule,
 ] as const;
 
 /**
@@ -110,17 +172,42 @@ function resolveModulesDir(): string {
  */
 export const SELECTION_TO_MODULE_ID: Readonly<Record<string, string>> = {
   // Frontend
-  nextjs:       "frontend-nextjs",
+  nextjs:          "frontend-nextjs",
+  "react-vite":    "frontend-react-vite",
+  vue:             "frontend-vue",
+  svelte:          "frontend-svelte",
   // Backend
-  express:      "backend-express",
+  express:         "backend-express",
+  nestjs:          "backend-nestjs",
+  fastapi:         "backend-fastapi",
+  django:          "backend-django",
   // Database
-  postgresql:   "database-postgresql",
+  postgresql:      "database-postgresql",
+  mysql:           "database-mysql",
+  mongodb:         "database-mongodb",
+  sqlite:          "database-sqlite",
+  supabase:        "database-supabase",
   // Auth
-  jwt:          "auth-jwt",
+  jwt:             "auth-jwt",
+  oauth:           "auth-oauth",
+  session:         "auth-session",
+  clerk:           "auth-clerk",
+  auth0:           "auth-auth0",
   // UI
-  tailwind:     "ui-tailwind",
+  tailwind:        "ui-tailwind",
+  shadcn:          "ui-shadcn",
+  mui:             "ui-mui",
+  chakra:          "ui-chakra",
+  bootstrap:       "ui-bootstrap",
+  // State Management
+  zustand:         "state-zustand",
+  redux:           "state-redux",
+  "tanstack-query": "state-tanstack-query",
   // Deployment
-  docker:       "deployment-docker",
+  docker:          "deployment-docker",
+  vercel:          "deployment-vercel",
+  render:          "deployment-render",
+  aws:             "deployment-aws",
 } as const;
 
 /**

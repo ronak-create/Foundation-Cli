@@ -123,6 +123,7 @@ export {
   type HookName,
   type HookRunnerOptions,
   runExecutionPipeline,
+  detectCiMode,
   type ExecutionPipelineOptions,
   type ExecutionPipelineResult,
   type PipelineEvent,

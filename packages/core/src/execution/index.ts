@@ -34,6 +34,7 @@ export {
 
 export {
   runExecutionPipeline,
+  detectCiMode,
   type ExecutionPipelineOptions,
   type ExecutionPipelineResult,
   type PipelineEvent,

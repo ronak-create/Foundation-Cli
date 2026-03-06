@@ -1,3 +1,8 @@
+// core/src/execution/config-merger.ts
+//
+// GAP FILLED: requirements.txt merge strategy added to applyPatchToFile (spec §5.1)
+// All other strategies unchanged from Phase 3 implementation.
+
 import fs from "node:fs/promises";
 import path from "node:path";
 import { mergeWith } from "lodash-es";
@@ -5,8 +10,9 @@ import yaml from "js-yaml";
 import { FoundationError } from "../errors.js";
 import { safeResolve } from "../path-utils.js";
 import type { ConfigPatch } from "@foundation-cli/plugin-sdk";
+import { mergeRequirements, RequirementsMergeError } from "../file-merger/requiremenets-merge.js";
 
-// ── Error ─────────────────────────────────────────────────────────────────────
+// ── Errors ────────────────────────────────────────────────────────────────────
 
 export class ConfigMergeError extends FoundationError {
   constructor(
@@ -26,10 +32,9 @@ export class ConfigMergeError extends FoundationError {
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
-
 type JsonObject = Record<string, JsonValue>;
 
-// ── Deep merge (JSON objects) ─────────────────────────────────────────────────
+// ── Deep merge (JSON / YAML objects) ─────────────────────────────────────────
 
 function deepMergeObjects(
   target: JsonObject,
@@ -55,9 +60,8 @@ function deepMergeObjects(
           filePath,
           currentPath,
           new Error(
-            `Type mismatch: cannot merge ${Array.isArray(objVal) ? "array" : typeof objVal} with ${
-              Array.isArray(srcVal) ? "array" : typeof srcVal
-            }`,
+            `Type mismatch: cannot merge ${Array.isArray(objVal) ? "array" : typeof objVal} ` +
+              `with ${Array.isArray(srcVal) ? "array" : typeof srcVal}`,
           ),
         );
       }
@@ -83,14 +87,11 @@ function mergeArrayValues(a: JsonValue[], b: JsonValue[]): JsonValue[] {
   const allPrimitive = a.every(isPrimitive) && b.every(isPrimitive);
 
   if (allPrimitive) {
-    const seen = new Set<string>();
+    const seen   = new Set<string>();
     const result: JsonValue[] = [];
     for (const item of [...a, ...b]) {
       const key = JSON.stringify(item);
-      if (!seen.has(key)) {
-        seen.add(key);
-        result.push(item);
-      }
+      if (!seen.has(key)) { seen.add(key); result.push(item); }
     }
     return result;
   }
@@ -113,18 +114,12 @@ function assertNoDependencyVersionConflict(
 
   for (const field of depFields) {
     const existingDeps = existing[field];
-    const patchDeps = patch[field];
+    const patchDeps    = patch[field];
 
     if (
-      typeof existingDeps !== "object" ||
-      existingDeps === null ||
-      Array.isArray(existingDeps) ||
-      typeof patchDeps !== "object" ||
-      patchDeps === null ||
-      Array.isArray(patchDeps)
-    ) {
-      continue;
-    }
+      typeof existingDeps !== "object" || existingDeps === null || Array.isArray(existingDeps) ||
+      typeof patchDeps    !== "object" || patchDeps    === null || Array.isArray(patchDeps)
+    ) continue;
 
     for (const [pkg, patchVersion] of Object.entries(patchDeps as JsonObject)) {
       const existingVersion = (existingDeps as JsonObject)[pkg];
@@ -133,7 +128,8 @@ function assertNoDependencyVersionConflict(
           filePath,
           `${field}.${pkg}`,
           new Error(
-            `Conflicting versions: existing "${String(existingVersion)}" vs patch "${String(patchVersion)}"`,
+            `Conflicting versions: existing "${String(existingVersion)}" ` +
+              `vs patch "${String(patchVersion)}"`,
           ),
         );
       }
@@ -145,11 +141,9 @@ function assertNoDependencyVersionConflict(
 
 export function mergeJsonContent(existing: string, patch: JsonObject, filePath: string): string {
   const existingObj = JSON.parse(existing) as JsonObject;
-
   if (filePath.endsWith("package.json")) {
     assertNoDependencyVersionConflict(existingObj, patch, filePath);
   }
-
   const merged = deepMergeObjects(existingObj, patch, filePath);
   return JSON.stringify(merged, null, 2);
 }
@@ -158,11 +152,7 @@ export function mergeYamlContent(existing: string, patch: JsonObject, filePath: 
   const existingObj = existing.trim() === "" ? {} : (yaml.load(existing) as JsonObject);
 
   if (typeof existingObj !== "object" || existingObj === null || Array.isArray(existingObj)) {
-    throw new ConfigMergeError(
-      filePath,
-      "(root)",
-      new Error("Existing YAML root is not an object"),
-    );
+    throw new ConfigMergeError(filePath, "(root)", new Error("Existing YAML root is not an object"));
   }
 
   const merged = deepMergeObjects(existingObj, patch, filePath);
@@ -170,8 +160,8 @@ export function mergeYamlContent(existing: string, patch: JsonObject, filePath: 
 }
 
 export function mergeEnvContent(existing: string, patch: Record<string, string>): string {
-  const lines = existing.split("\n");
-  const patchKeys = new Set(Object.keys(patch));
+  const lines      = existing.split("\n");
+  const patchKeys  = new Set(Object.keys(patch));
   const writtenKeys = new Set<string>();
 
   const result: string[] = lines.map((line) => {
@@ -184,17 +174,12 @@ export function mergeEnvContent(existing: string, patch: Record<string, string>)
     const key = line.slice(0, eqIdx).trim();
     writtenKeys.add(key);
 
-    if (patchKeys.has(key)) {
-      return `${key}=${patch[key] ?? ""}`;
-    }
+    if (patchKeys.has(key)) return `${key}=${patch[key] ?? ""}`;
     return line;
   });
 
-  // Append new keys not present in existing
   for (const [key, value] of Object.entries(patch)) {
-    if (!writtenKeys.has(key)) {
-      result.push(`${key}=${value}`);
-    }
+    if (!writtenKeys.has(key)) result.push(`${key}=${value}`);
   }
 
   return result.join("\n");
@@ -205,13 +190,17 @@ export function mergeEnvContent(existing: string, patch: Record<string, string>)
 /**
  * Applies a single ConfigPatch to the file at targetDir/patch.targetFile.
  * If the file does not exist, it is seeded with an appropriate empty structure.
- * Writes the result back to disk.
+ *
+ * Supported file types (spec §5.1):
+ *   .json        → deep-merge-smart
+ *   .yaml / .yml → yaml-deep-merge
+ *   .env         → append-unique-keyed
+ *   requirements.txt → semver-merge  ← NEW
  */
 export async function applyPatchToFile(targetDir: string, patch: ConfigPatch): Promise<void> {
   const resolvedTarget = path.resolve(targetDir);
-  const absolutePath = safeResolve(resolvedTarget, patch.targetFile);
+  const absolutePath   = safeResolve(resolvedTarget, patch.targetFile);
 
-  // Read existing content (or seed)
   let existing: string;
   try {
     existing = await fs.readFile(absolutePath, "utf-8");
@@ -225,8 +214,10 @@ export async function applyPatchToFile(targetDir: string, patch: ConfigPatch): P
 
   if (patch.targetFile.endsWith(".json")) {
     merged = mergeJsonContent(existing, patchData, patch.targetFile);
+
   } else if (patch.targetFile.endsWith(".yaml") || patch.targetFile.endsWith(".yml")) {
     merged = mergeYamlContent(existing, patchData, patch.targetFile);
+
   } else if (
     patch.targetFile === ".env" ||
     patch.targetFile === ".env.example" ||
@@ -235,11 +226,33 @@ export async function applyPatchToFile(targetDir: string, patch: ConfigPatch): P
   ) {
     const envPatch = Object.fromEntries(Object.entries(patchData).map(([k, v]) => [k, String(v)]));
     merged = mergeEnvContent(existing, envPatch);
+
+  } else if (
+    patch.targetFile === "requirements.txt" ||
+    patch.targetFile.endsWith("/requirements.txt") ||
+    patch.targetFile.endsWith("/requirements.in")
+  ) {
+    // GAP: requirements.txt semver-merge (spec §5.1)
+    // patchData must be { "<package>": "<constraint>" } for requirements merges
+    const reqPatch = Object.entries(patchData)
+      .map(([pkg, ver]) => `${pkg}${String(ver)}`)
+      .join("\n");
+    try {
+      merged = mergeRequirements(existing, reqPatch);
+    } catch (err) {
+      if (err instanceof RequirementsMergeError) {
+        throw new ConfigMergeError(patch.targetFile, err.packageName, err);
+      }
+      throw err;
+    }
+
   } else {
     throw new ConfigMergeError(
       patch.targetFile,
       "(root)",
-      new Error(`Unsupported config file type. Supported: .json, .yaml, .yml, .env`),
+      new Error(
+        `Unsupported config file type. Supported: .json, .yaml, .yml, .env, requirements.txt`,
+      ),
     );
   }
 
@@ -259,15 +272,15 @@ export async function applyAllPatches(
   }
 }
 
+// ── Seed content for new files ─────────────────────────────────────────────
+
 function seedContent(targetFile: string): string {
-  if (targetFile.endsWith(".json")) return "{}";
+  if (targetFile.endsWith(".json"))                         return "{}";
   if (targetFile.endsWith(".yaml") || targetFile.endsWith(".yml")) return "";
   if (
-    targetFile === ".env" ||
-    targetFile === ".env.example" ||
-    targetFile.endsWith("/.env") ||
-    targetFile.endsWith("/.env.example")
-  )
-    return "";
+    targetFile === ".env" || targetFile === ".env.example" ||
+    targetFile.endsWith("/.env") || targetFile.endsWith("/.env.example")
+  ) return "";
+  if (targetFile.endsWith("requirements.txt") || targetFile.endsWith("requirements.in")) return "";
   return "";
 }

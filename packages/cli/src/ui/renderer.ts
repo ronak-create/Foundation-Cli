@@ -111,6 +111,7 @@ const STAGE_LABELS: Record<PipelineStage, string> = {
   "after-write":    "🔧  Running post-write hooks",
   "write-state":    "💾  Saving project state",
   "complete":       "✔   Done",
+  "finalize":       "🎬  Finalizing",
 };
 
 /**
