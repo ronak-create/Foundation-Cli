@@ -1,0 +1,12 @@
+# .gitignore
+node_modules/
+dist/
+.turbo/
+coverage/
+*.tsbuildinfo
+.env
+.env.local
+.DS_Store
+*.log
+tmp/
+.cache/

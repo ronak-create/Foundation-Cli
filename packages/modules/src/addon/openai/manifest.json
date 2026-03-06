@@ -1,0 +1,28 @@
+{
+  "id": "plugin-openai",
+  "name": "OpenAI Integration",
+  "version": "1.0.0",
+  "description": "OpenAI chat completions, streaming, embeddings, and content moderation with type-safe helpers",
+  "category": "tooling",
+  "runtime": "node",
+  "dependencies": [
+    { "name": "openai", "version": "^4.47.1", "scope": "dependencies" }
+  ],
+  "files": [
+    { "relativePath": "src/ai/openai-client.ts", "content": "" },
+    { "relativePath": "src/ai/openai-embeddings.ts", "content": "" },
+    { "relativePath": "src/ai/openai-moderation.ts", "content": "" }
+  ],
+  "configPatches": [
+    {
+      "targetFile": ".env.example",
+      "merge": {
+        "OPENAI_API_KEY": "sk-...",
+        "OPENAI_ORG_ID": "",
+        "OPENAI_MODEL": "gpt-4o-mini"
+      }
+    }
+  ],
+  "compatibility": { "requires": [], "conflicts": [] },
+  "tags": ["ai", "openai", "llm", "embeddings", "gpt", "chat"]
+}

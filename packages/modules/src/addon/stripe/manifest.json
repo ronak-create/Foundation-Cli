@@ -1,0 +1,29 @@
+{
+  "id": "plugin-stripe",
+  "name": "Stripe Payments",
+  "version": "1.0.0",
+  "description": "Stripe payment processing integration with webhook support and type-safe API helpers",
+  "category": "tooling",
+  "runtime": "node",
+  "dependencies": [
+    { "name": "stripe", "version": "^15.7.0", "scope": "dependencies" },
+    { "name": "@types/stripe", "version": "^8.0.417", "scope": "devDependencies" }
+  ],
+  "files": [
+    { "relativePath": "src/payments/stripe.ts", "content": "" },
+    { "relativePath": "src/payments/stripe-webhooks.ts", "content": "" },
+    { "relativePath": "src/payments/stripe-types.ts", "content": "" }
+  ],
+  "configPatches": [
+    {
+      "targetFile": ".env.example",
+      "merge": {
+        "STRIPE_SECRET_KEY": "sk_test_...",
+        "STRIPE_PUBLISHABLE_KEY": "pk_test_...",
+        "STRIPE_WEBHOOK_SECRET": "whsec_..."
+      }
+    }
+  ],
+  "compatibility": { "requires": [], "conflicts": [] },
+  "tags": ["payments", "stripe", "billing", "webhooks"]
+}
