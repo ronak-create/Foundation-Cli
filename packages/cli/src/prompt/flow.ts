@@ -20,12 +20,7 @@ import { runPromptGraph, type SelectionMap } from "./graph.js";
 import { buildFoundationGraph } from "./graph-definition.js";
 import { inquirerAdapter } from "./adapter.js";
 import { getArchetype } from "./archetypes.js";
-import {
-  printBanner,
-  printSection,
-  printSummaryTable,
-  printAbort,
-} from "../ui/renderer.js";
+import { printBanner, printSection, printSummaryTable, printAbort } from "../ui/renderer.js";
 import type { ModuleRegistry } from "@foundation-cli/core";
 import { collectCredentials, type CollectedCredentials } from "./credential-collector.js";
 
@@ -70,51 +65,51 @@ export interface UserSelection {
  */
 const DISPLAY_LABELS: Readonly<Record<string, string>> = {
   // Frontends
-  nextjs:       "Next.js",
+  nextjs: "Next.js",
   "react-vite": "React + Vite",
-  vue:          "Vue 3",
-  svelte:       "Svelte",
+  vue: "Vue 3",
+  svelte: "Svelte",
   // Backends
-  express:  "Express",
-  nestjs:   "NestJS",
-  fastapi:  "FastAPI",
-  django:   "Django",
+  express: "Express",
+  nestjs: "NestJS",
+  fastapi: "FastAPI",
+  django: "Django",
   // Databases
   postgresql: "PostgreSQL",
-  mysql:      "MySQL",
-  mongodb:    "MongoDB",
-  sqlite:     "SQLite",
-  supabase:   "Supabase",
+  mysql: "MySQL",
+  mongodb: "MongoDB",
+  sqlite: "SQLite",
+  supabase: "Supabase",
   // Auth
-  jwt:     "JWT",
-  oauth:   "OAuth (Google + GitHub)",
+  jwt: "JWT",
+  oauth: "OAuth (Google + GitHub)",
   session: "Session-based",
-  clerk:   "Clerk",
-  auth0:   "Auth0",
+  clerk: "Clerk",
+  auth0: "Auth0",
   // UI
-  tailwind:  "Tailwind CSS",
-  shadcn:    "ShadCN/UI",
-  mui:       "Material UI",
-  chakra:    "Chakra UI",
+  tailwind: "Tailwind CSS",
+  shadcn: "ShadCN/UI",
+  mui: "Material UI",
+  chakra: "Chakra UI",
   bootstrap: "Bootstrap",
   // State
-  zustand:        "Zustand",
-  redux:          "Redux Toolkit",
+  zustand: "Zustand",
+  redux: "Redux Toolkit",
   "tanstack-query": "TanStack Query",
   // Deployment
   docker: "Docker",
   vercel: "Vercel",
   render: "Render",
-  aws:    "AWS",
+  aws: "AWS",
   // Archetypes
-  saas:            "SaaS Application",
-  "ai-app":        "AI Application",
-  ecommerce:       "E-commerce",
-  crm:             "CRM",
-  dashboard:       "Full-stack Dashboard",
-  "api-backend":   "API Backend",
+  saas: "SaaS Application",
+  "ai-app": "AI Application",
+  ecommerce: "E-commerce",
+  crm: "CRM",
+  dashboard: "Full-stack Dashboard",
+  "api-backend": "API Backend",
   "internal-tool": "Internal Tool",
-  custom:          "Custom",
+  custom: "Custom",
   // Catch-all
   none: "None",
 };
@@ -162,9 +157,7 @@ export async function runPromptFlow(
 ): Promise<UserSelection> {
   // Back-compat: allow passing adapter directly (old call signature)
   const options: PromptFlowOptions =
-    typeof optionsOrAdapter === "function"
-      ? { adapter: optionsOrAdapter }
-      : optionsOrAdapter;
+    "select" in optionsOrAdapter ? { adapter: optionsOrAdapter } : optionsOrAdapter;
 
   const {
     adapter = inquirerAdapter,
@@ -190,17 +183,17 @@ export async function runPromptFlow(
 
   // ── 2. Build RawSelections from SelectionMap ───────────────────────────────
   const rawSelections: RawSelections = {
-    frontend:        answers["frontend"]        ?? "none",
-    backend:         answers["backend"]         ?? "none",
-    database:        answers["database"]        ?? "none",
-    auth:            answers["auth"]            ?? "none",
-    ui:              answers["ui"]              ?? "none",
+    frontend: answers["frontend"] ?? "none",
+    backend: answers["backend"] ?? "none",
+    database: answers["database"] ?? "none",
+    auth: answers["auth"] ?? "none",
+    ui: answers["ui"] ?? "none",
     stateManagement: answers["stateManagement"] ?? "none",
-    deployment:      answers["deployment"]      ?? "none",
+    deployment: answers["deployment"] ?? "none",
   };
 
-  const projectName  = (answers["projectName"] ?? "my-app").trim();
-  const projectType  = answers["projectType"] ?? "custom";
+  const projectName = (answers["projectName"] ?? "my-app").trim();
+  const projectType = answers["projectType"] ?? "custom";
 
   // ── 2b. Status enforcement (spec §11.3) ───────────────────────────────────
   // When a registry is available, check each selection's manifest status.
@@ -219,13 +212,13 @@ export async function runPromptFlow(
 
       if (status === "removed") {
         const url = `https://foundation.build/migrations/${moduleId}`;
-        throw new Error(
-          `Module "${manifest.name}" has been removed. See migration guide: ${url}`,
-        );
+        throw new Error(`Module "${manifest.name}" has been removed. See migration guide: ${url}`);
       }
       if (status === "deprecated") {
         process.stderr.write(
-          chalk.yellow(`⚠  ${manifest.name} is deprecated and will be removed in a future release.\n`),
+          chalk.yellow(
+            `⚠  ${manifest.name} is deprecated and will be removed in a future release.\n`,
+          ),
         );
       }
       if (status === "experimental") {
@@ -247,13 +240,13 @@ export async function runPromptFlow(
   const archetype = getArchetype(projectType);
 
   printSummaryTable([
-    { label: "Project",    value: projectName },
-    { label: "Type",       value: archetype?.name ?? labelOf(projectType) },
-    { label: "Frontend",   value: labelOf(rawSelections.frontend) },
-    { label: "Backend",    value: labelOf(rawSelections.backend) },
-    { label: "Database",   value: labelOf(rawSelections.database) },
-    { label: "Auth",       value: labelOf(rawSelections.auth) },
-    { label: "UI System",  value: labelOf(rawSelections.ui) },
+    { label: "Project", value: projectName },
+    { label: "Type", value: archetype?.name ?? labelOf(projectType) },
+    { label: "Frontend", value: labelOf(rawSelections.frontend) },
+    { label: "Backend", value: labelOf(rawSelections.backend) },
+    { label: "Database", value: labelOf(rawSelections.database) },
+    { label: "Auth", value: labelOf(rawSelections.auth) },
+    { label: "UI System", value: labelOf(rawSelections.ui) },
     { label: "State Mgmt", value: labelOf(rawSelections.stateManagement) },
     { label: "Deployment", value: labelOf(rawSelections.deployment) },
   ]);
@@ -281,11 +274,7 @@ export async function runPromptFlow(
   // API keys). This is kept separate from stack selection to preserve clean
   // UX separation: choose stack first, configure it second.
   const allSelectionValues = Object.values(rawSelections);
-  const credentials = await collectCredentials(
-    allSelectionValues,
-    adapter,
-    ciMode,
-  );
+  const credentials = await collectCredentials(allSelectionValues, adapter, ciMode);
 
   return {
     projectName,
@@ -333,9 +322,7 @@ function deriveModuleList(raw: RawSelections): ReadonlyArray<string> {
  * This wrapping approach keeps section-header logic out of the graph runner
  * (which shouldn't know about UI) while preserving the clean DAG structure.
  */
-function withSectionHeaders(
-  base: typeof inquirerAdapter,
-): typeof inquirerAdapter {
+function withSectionHeaders(base: typeof inquirerAdapter): typeof inquirerAdapter {
   // Track which sections have already been announced.
   const announced = new Set<string>();
 
@@ -369,13 +356,13 @@ function withSectionHeaders(
       // Infer the node from the message text by checking for keyword prefixes.
       // This is a lightweight heuristic — a future phase can pass node.id explicitly.
       const msg = opts.message.toLowerCase();
-      if (msg.includes("frontend"))         maybeAnnounce("frontend");
-      else if (msg.includes("backend"))     maybeAnnounce("backend");
-      else if (msg.includes("database"))    maybeAnnounce("database");
-      else if (msg.includes("auth"))        maybeAnnounce("auth");
-      else if (msg.includes("ui system"))   maybeAnnounce("ui");
-      else if (msg.includes("state"))       maybeAnnounce("stateManagement");
-      else if (msg.includes("deployment"))  maybeAnnounce("deployment");
+      if (msg.includes("frontend")) maybeAnnounce("frontend");
+      else if (msg.includes("backend")) maybeAnnounce("backend");
+      else if (msg.includes("database")) maybeAnnounce("database");
+      else if (msg.includes("auth")) maybeAnnounce("auth");
+      else if (msg.includes("ui system")) maybeAnnounce("ui");
+      else if (msg.includes("state")) maybeAnnounce("stateManagement");
+      else if (msg.includes("deployment")) maybeAnnounce("deployment");
       return base.select(opts);
     },
     async text(opts) {
