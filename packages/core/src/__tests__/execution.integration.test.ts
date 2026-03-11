@@ -2,7 +2,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import path from "node:path";
-import type { JsonObject } from "../execution";
+import type { JsonObject } from "../execution/config-merger.js";
 import fs from "node:fs/promises";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
