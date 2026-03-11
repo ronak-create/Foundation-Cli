@@ -203,12 +203,14 @@ export async function runPromptFlow(
   if (registry) {
     const { SELECTION_TO_MODULE_ID } = await import("@foundation-cli/modules");
 
-    const map = SELECTION_TO_MODULE_ID as Record<string, string>;
+    const map: Record<string, string> = SELECTION_TO_MODULE_ID as Record<string, string>;
 
-    for (const selectionValue of Object.values(rawSelections)) {
+    for (const selectionValue of Object.values(rawSelections) as string[]) {
       if (!selectionValue || selectionValue === "none") continue;
 
-      const moduleId = selectionValue in map ? map[selectionValue] : selectionValue;
+      const moduleId: string = Object.prototype.hasOwnProperty.call(map, selectionValue)
+        ? (map[selectionValue] as string)
+        : selectionValue;
       if (!registry.hasModule(moduleId)) continue;
       const manifest = registry.getModule(moduleId)?.manifest;
       if (!manifest) continue;
