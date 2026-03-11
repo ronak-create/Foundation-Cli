@@ -171,7 +171,7 @@ export async function fetchPluginFromDirectory(localDir: string): Promise<Fetche
   let packageJson: Record<string, unknown> = { name: path.basename(absDir), version: "0.0.0" };
   try {
     packageJson = JSON.parse(await fs.readFile(pkgJsonPath, "utf-8")) as Record<string, unknown>;
-  } catch {}
+  } catch { /* package.json is optional — fallback used */ }
 
   let rawManifest: unknown;
   try {
