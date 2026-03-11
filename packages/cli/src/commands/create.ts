@@ -107,7 +107,7 @@ export async function runCreateCommand(): Promise<void> {
   process.stdout.write("\n");
 
   // ── 7. Render templates ───────────────────────────────────────────────────
-  const templateVars: Record<string, unknown> = {
+  const templateVars: Record<string, string> = {
     projectName: selection.projectName,
     projectType: selection.projectType,
     ...selection.rawSelections,
@@ -120,13 +120,13 @@ export async function runCreateCommand(): Promise<void> {
     ...plan,
     files: renderAllTemplates(
       plan.files.map((f) => ({ relativePath: f.relativePath, content: f.content })),
-      templateVars as Record<string, string>,
+      templateVars,
     ).map((f) => ({ relativePath: f.relativePath, content: f.content })),
     configPatches: plan.configPatches.map((patch) => ({
       ...patch,
       merge: renderTemplateValues(
         patch.merge as Record<string, unknown>,
-        templateVars as Record<string, string>,
+        templateVars,
       ),
     })),
   };
