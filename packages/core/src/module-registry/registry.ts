@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import type { Dirent } from "node:fs";
 import path from "node:path";
 import type { PluginDefinition, ModuleManifest } from "@foundation-cli/plugin-sdk";
 import { DuplicateModuleError, ModuleNotFoundError } from "../errors.js";
@@ -97,7 +98,7 @@ export async function loadPluginsFromProject(
   registry: ModuleRegistry,
 ): Promise<ReadonlyArray<string>> {
   const pluginsDir = path.join(projectRoot, FOUNDATION_DIR, PLUGINS_SUBDIR);
-  let entries: import("fs").Dirent[];
+  let entries: Dirent[];
   try {
     entries = await fs.readdir(pluginsDir, { withFileTypes: true });
   } catch (err) {
@@ -128,7 +129,7 @@ export async function loadPluginsFromProject(
       continue;
     }
 
-    const manifest = rawManifest as ModuleManifest;
+    const manifest = rawManifest;
     if (registry.hasModule(manifest.id)) continue;
 
     // Load sandboxed hook sources if present
