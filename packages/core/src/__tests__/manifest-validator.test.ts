@@ -118,7 +118,7 @@ describe("ManifestValidator.validate — valid manifests", () => {
 describe("ManifestValidator.validate — id field", () => {
   it("rejects missing id", () => {
     const m = validManifest();
-    delete (m as Record<string, unknown>)["id"];
+    delete m["id"];
     const result = ManifestValidator.validate(m);
     expect(result.valid).toBe(false);
     expect(result.fieldErrors.some((e) => e.field.includes("id"))).toBe(true);
@@ -174,7 +174,7 @@ describe("ManifestValidator.validate — id field", () => {
 describe("ManifestValidator.validate — version field", () => {
   it("rejects missing version", () => {
     const m = validManifest();
-    delete (m as Record<string, unknown>)["version"];
+    delete m["version"];
     const result = ManifestValidator.validate(m);
     expect(result.valid).toBe(false);
     expect(result.fieldErrors.some((e) => e.field.includes("version"))).toBe(true);
@@ -252,7 +252,7 @@ describe("ManifestValidator.validate — runtime field", () => {
 describe("ManifestValidator.validate — category field", () => {
   it("rejects missing category", () => {
     const m = validManifest();
-    delete (m as Record<string, unknown>)["category"];
+    delete m["category"];
     const result = ManifestValidator.validate(m);
     expect(result.valid).toBe(false);
   });
@@ -503,7 +503,7 @@ describe("ManifestValidator.effectiveRuntime", () => {
   function toManifest(overrides: Partial<Record<string, unknown>> = {}): ModuleManifest {
     const data = validManifest(overrides);
     ManifestValidator.assert(data);
-    return data as ModuleManifest;
+    return data;
   }
 
   it("returns 'node' when runtime field is absent", () => {
@@ -532,7 +532,7 @@ describe("ModuleRegistry uses ManifestValidator", () => {
 
     expect(() =>
       registry.registerModule({
-        manifest: validManifest() as unknown as ModuleManifest,
+        manifest: validManifest()  as ModuleManifest,
       }),
     ).not.toThrow();
   });
