@@ -284,7 +284,7 @@ export async function generateProject(
 function buildTemplateVariables(
   selection: UserSelection,
   projectRoot: string,
-): Record<string, unknown> {
+): Record<string, string> {
   return {
     projectName: selection.projectName,
     projectType: selection.projectType,
@@ -297,8 +297,8 @@ function buildTemplateVariables(
     stateManagement: selection.rawSelections.stateManagement,
     deployment: selection.rawSelections.deployment,
     // Common derived flags used in templates
-    hasDocker: selection.rawSelections.deployment === "docker",
-    hasTypeScript: true,
+    hasDocker: String(selection.rawSelections.deployment === "docker"),
+    hasTypeScript: "true",
     databaseUrl: buildDatabaseUrl(selection.rawSelections.database),
     authProvider: selection.rawSelections.auth,
   };
@@ -341,7 +341,7 @@ async function applyConfigPatches(
     const merged = applyConfigPatch(
       patch.targetFile,
       existingContent,
-      patch.merge as Record<string, unknown>,
+      patch.merge,
     );
 
     await fsModule.default.mkdir(pathModule.default.dirname(targetPath), { recursive: true });
