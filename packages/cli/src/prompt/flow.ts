@@ -26,6 +26,8 @@ import {
   printSummaryTable,
   printAbort,
 } from "../ui/renderer.js";
+import type { ModuleRegistry } from "@foundation-cli/core";
+import { collectCredentials, type CollectedCredentials } from "./credential-collector.js";
 
 // ── Public types ───────────────────────────────────────────────────────────────
 
@@ -56,6 +58,8 @@ export interface UserSelection {
   readonly rawSelections: RawSelections;
   /** Ordered list of selected module IDs (derived from rawSelections). */
   readonly selectedModules: ReadonlyArray<string>;
+  /** Credentials collected in the second-pass prompt phase (Phase 1). */
+  readonly credentials: CollectedCredentials;
 }
 
 // ── Display labels ─────────────────────────────────────────────────────────────
@@ -134,9 +138,40 @@ function labelOf(value: string): string {
  * @param adapter  Dependency-injected PromptAdapter. Defaults to the
  *                 production @inquirer/prompts adapter. Tests pass a stub.
  */
+// ── PromptFlowOptions ──────────────────────────────────────────────────────────
+
+export interface PromptFlowOptions {
+  /** Injected adapter (overrides default inquirerAdapter — useful for testing). */
+  readonly adapter?: typeof inquirerAdapter;
+  /**
+   * Module registry. When provided, module status is read from manifests to:
+   *   - Append [experimental] / [deprecated] labels to choices (spec §11.3)
+   *   - Block experimental modules in CI unless allowExperimental is set
+   */
+  readonly registry?: ModuleRegistry;
+  /** When true, suppress interactive prompts and use archetype defaults (CI mode). */
+  readonly ciMode?: boolean;
+  /** Allow experimental modules in CI (requires --allow-experimental flag). */
+  readonly allowExperimental?: boolean;
+  /** Preset archetype to use in CI mode (e.g. "saas", "api-backend"). */
+  readonly preset?: string;
+}
+
 export async function runPromptFlow(
-  adapter = inquirerAdapter,
+  optionsOrAdapter: PromptFlowOptions | typeof inquirerAdapter = {},
 ): Promise<UserSelection> {
+  // Back-compat: allow passing adapter directly (old call signature)
+  const options: PromptFlowOptions =
+    typeof optionsOrAdapter === "function"
+      ? { adapter: optionsOrAdapter }
+      : optionsOrAdapter;
+
+  const {
+    adapter = inquirerAdapter,
+    registry,
+    ciMode = false,
+    allowExperimental = false,
+  } = options;
   printBanner();
 
   // ── 1. Print first section header before running the graph ────────────────
@@ -166,6 +201,45 @@ export async function runPromptFlow(
 
   const projectName  = (answers["projectName"] ?? "my-app").trim();
   const projectType  = answers["projectType"] ?? "custom";
+
+  // ── 2b. Status enforcement (spec §11.3) ───────────────────────────────────
+  // When a registry is available, check each selection's manifest status.
+  // - experimental: warn always; hard-error in CI unless --allow-experimental
+  // - deprecated:   always warn with successor info
+  // - removed:      hard error with migration guide URL
+  if (registry) {
+    const { SELECTION_TO_MODULE_ID } = await import("@foundation-cli/modules");
+    for (const selectionValue of Object.values(rawSelections)) {
+      if (!selectionValue || selectionValue === "none") continue;
+      const moduleId = SELECTION_TO_MODULE_ID[selectionValue] ?? selectionValue;
+      if (!registry.hasModule(moduleId)) continue;
+      const manifest = registry.getModule(moduleId)?.manifest;
+      if (!manifest) continue;
+      const status = manifest.status ?? "stable";
+
+      if (status === "removed") {
+        const url = `https://foundation.build/migrations/${moduleId}`;
+        throw new Error(
+          `Module "${manifest.name}" has been removed. See migration guide: ${url}`,
+        );
+      }
+      if (status === "deprecated") {
+        process.stderr.write(
+          chalk.yellow(`⚠  ${manifest.name} is deprecated and will be removed in a future release.\n`),
+        );
+      }
+      if (status === "experimental") {
+        if (ciMode && !allowExperimental) {
+          throw new Error(
+            `Module "${manifest.name}" is experimental. Pass --allow-experimental to use it in CI mode.`,
+          );
+        }
+        process.stderr.write(
+          chalk.dim(`ℹ  ${manifest.name} is [experimental] and may change without notice.\n`),
+        );
+      }
+    }
+  }
 
   // ── 3. Confirmation summary ────────────────────────────────────────────────
   printSection("Summary");
@@ -201,11 +275,24 @@ export async function runPromptFlow(
   // so callers (and tests) can inspect it without re-deriving it.
   const selectedModules = deriveModuleList(rawSelections);
 
+  // ── 6. Collect credentials (Phase 1 — second-pass prompt phase) ───────────
+  // After the user confirms their stack, we run a second prompt pass that
+  // asks for credentials required by each selected module (e.g. DB passwords,
+  // API keys). This is kept separate from stack selection to preserve clean
+  // UX separation: choose stack first, configure it second.
+  const allSelectionValues = Object.values(rawSelections);
+  const credentials = await collectCredentials(
+    allSelectionValues,
+    adapter,
+    ciMode,
+  );
+
   return {
     projectName,
     projectType,
     rawSelections,
     selectedModules,
+    credentials,
   };
 }
 

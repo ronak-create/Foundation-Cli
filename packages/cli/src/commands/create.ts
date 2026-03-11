@@ -14,6 +14,7 @@ import {
   selectionsToModuleIds,
 } from "@foundation-cli/modules";
 import { runPromptFlow } from "../prompt/flow.js";
+import { writeEnvFiles } from "../execution/env-writer.js";
 import {
   createPipelineRenderer,
   createStepSpinner,
@@ -110,6 +111,9 @@ export async function runCreateCommand(): Promise<void> {
     projectName: selection.projectName,
     projectType: selection.projectType,
     ...selection.rawSelections,
+    // Inject collected credentials so EJS templates can reference them
+    // e.g. <%= DATABASE_URL %> or <%= JWT_SECRET %>
+    ...selection.credentials.envVars,
   };
 
   const renderedPlan = {
@@ -127,10 +131,25 @@ export async function runCreateCommand(): Promise<void> {
     })),
   };
 
+  // ── 7b. Write credentials to .env BEFORE pipeline ────────────────────────
+  // This must happen before runExecutionPipeline so that when config patches
+  // run (applyAllPatches → mergeEnvContent), existing credential keys are
+  // preserved and placeholder values from manifests are NOT written over them.
+  const { envVars, exampleVars } = selection.credentials;
+  if (Object.keys(envVars).length > 0) {
+    const targetDir = path.resolve(process.cwd(), selection.projectName);
+    const envSpinner = createStepSpinner("Writing environment files…");
+    await writeEnvFiles({
+      targetDir,
+      envVars,
+      exampleVars,
+    });
+    envSpinner.succeed(chalk.dim(".env and .env.example written"));
+  }
+
   // ── 8. Execute pipeline ───────────────────────────────────────────────────
   const { handler, stop } = createPipelineRenderer();
   const targetDir = path.resolve(process.cwd(), selection.projectName);
-
   try {
     await runExecutionPipeline(renderedPlan, {
       targetDir,

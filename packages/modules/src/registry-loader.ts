@@ -61,11 +61,15 @@ import { dockerModule }        from "./deployment/docker.js";
 import { vercelModule }        from "./deployment/vercel.js";
 import { renderModule }        from "./deployment/render.js";
 import { awsModule }           from "./deployment/aws.js";
+import { prismaModule }        from "./orm/prisma.js";
+import { typeormModule }       from "./orm/typeorm.js";
+import { sqlalchemyModule }    from "./orm/sqlalchemy.js";
+import { mongooseModule }      from "./orm/mongoose.js";
 
 // ── Static registration ────────────────────────────────────────────────────────
 
 /** All built-in PluginDefinitions in the order they should be registered. */
-const BUILTIN_MODULES = [
+export const BUILTIN_MODULES = [
   // Frontend
   nextjsModule,
   reactViteModule,
@@ -103,6 +107,10 @@ const BUILTIN_MODULES = [
   vercelModule,
   renderModule,
   awsModule,
+  prismaModule,
+  typeormModule,
+  sqlalchemyModule,
+  mongooseModule,
 ] as const;
 
 /**
@@ -208,6 +216,11 @@ export const SELECTION_TO_MODULE_ID: Readonly<Record<string, string>> = {
   vercel:          "deployment-vercel",
   render:          "deployment-render",
   aws:             "deployment-aws",
+  // ORM
+  prisma:          "orm-prisma",
+  typeorm:         "orm-typeorm",
+  sqlalchemy:      "orm-sqlalchemy",
+  mongoose:        "orm-mongoose",
 } as const;
 
 /**

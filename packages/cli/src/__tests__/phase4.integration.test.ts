@@ -174,7 +174,7 @@ describe("conflict detection", () => {
     // Manually add a mysql stub to test conflict
     registry.registerModule({
       manifest: {
-        id: "database-mysql",
+        id: "database-mysql-test",
         name: "MySQL",
         version: "1.0.0",
         description: "MySQL stub",
@@ -200,7 +200,7 @@ describe("conflict detection", () => {
 
     registry.registerModule({
       manifest: {
-        id: "backend-nestjs",
+        id: "backend-nestjs-test",
         name: "NestJS",
         version: "1.0.0",
         description: "NestJS stub",

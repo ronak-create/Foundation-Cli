@@ -41,6 +41,8 @@ import {
   dockerModule,
 } from "../index.js";
 
+import { BUILTIN_MODULES } from "../registry-loader.js";
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function makeTmp(): Promise<string> {
@@ -750,7 +752,7 @@ describe("loadBuiltinModules (static path — regression)", () => {
     const registry = new ModuleRegistry();
     loadBuiltinModules(registry);
     expect(() => loadBuiltinModules(registry)).not.toThrow();
-    expect(registry.size).toBe(6);
+    expect(registry.size).toBe(BUILTIN_MODULES.length);
   });
 
   it("all 6 modules are registered as 'builtin'", () => {

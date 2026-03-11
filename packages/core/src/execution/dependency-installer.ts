@@ -20,7 +20,7 @@ export class DependencyInstallError extends FoundationError {
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-export type PackageManager = "pnpm" | "yarn" | "npm";
+export type PackageManager = "pnpm" | "yarn" | "npm" | "pip";
 
 export interface InstallProgress {
   readonly stage: "detecting" | "writing-package-json" | "installing" | "done";
@@ -141,6 +141,91 @@ export async function writeDepsToPackageJson(
   
   await fs.mkdir(path.dirname(pkgPath), { recursive: true });
   await fs.writeFile(pkgPath, JSON.stringify(updated, null, 2), "utf-8");
+}
+
+// ── Python / pip installer ────────────────────────────────────────────────────
+
+export interface PythonInstallOptions {
+  readonly targetDir: string;
+  readonly packages: ReadonlyArray<string>; // e.g. ["fastapi>=0.111.0", "uvicorn>=0.30.0"]
+  readonly onProgress?: (progress: InstallProgress) => void;
+  readonly dryRun?: boolean;
+}
+
+export interface PythonInstallResult {
+  readonly installed: ReadonlyArray<string>;
+  readonly duration: number;
+}
+
+/**
+ * Merges Python package specs into requirements.txt and runs `pip install -r`.
+ *
+ * Deduplicates by package name (later entry wins). Skips the actual
+ * `pip install` call in dryRun mode.
+ */
+export async function installPythonDependencies(
+  options: PythonInstallOptions,
+): Promise<PythonInstallResult> {
+  const { targetDir, packages, dryRun = false, onProgress } = options;
+  const start = Date.now();
+
+  if (packages.length === 0) {
+    return { installed: [], duration: 0 };
+  }
+
+  onProgress?.({ stage: "writing-package-json", message: "Writing requirements.txt…" });
+
+  const reqPath = path.join(path.resolve(targetDir), "requirements.txt");
+  let existing = "";
+  try {
+    existing = await fs.readFile(reqPath, "utf-8");
+  } catch {
+    // file doesn't exist yet — start fresh
+  }
+
+  // Merge: parse existing, overwrite matching package names with new constraints
+  const lines = existing.split("\n").filter((l) => l.trim() && !l.trim().startsWith("#"));
+  const lineMap = new Map<string, string>();
+  for (const line of lines) {
+    const name = line.split(/[><=!~\[;\s]/)[0]?.toLowerCase() ?? "";
+    if (name) lineMap.set(name, line.trim());
+  }
+  for (const pkg of packages) {
+    const name = pkg.split(/[><=!~\[;\s]/)[0]?.toLowerCase() ?? "";
+    if (name) lineMap.set(name, pkg);
+  }
+
+  const merged = Array.from(lineMap.values()).join("\n") + "\n";
+  await fs.mkdir(path.dirname(reqPath), { recursive: true });
+  await fs.writeFile(reqPath, merged, "utf-8");
+
+  if (dryRun) {
+    return { installed: packages, duration: Date.now() - start };
+  }
+
+  onProgress?.({ stage: "installing", message: "Running pip install -r requirements.txt…" });
+
+  try {
+    await execa("pip", ["install", "-r", "requirements.txt"], {
+      cwd: path.resolve(targetDir),
+      reject: true,
+    });
+  } catch {
+    // Retry with pip3
+    try {
+      await execa("pip3", ["install", "-r", "requirements.txt"], {
+        cwd: path.resolve(targetDir),
+        reject: true,
+      });
+    } catch (err) {
+      throw new DependencyInstallError("pip", packages, err);
+    }
+  }
+
+  const duration = Date.now() - start;
+  onProgress?.({ stage: "done", message: `Installed ${packages.length} Python package(s) in ${(duration / 1000).toFixed(1)}s` });
+
+  return { installed: packages, duration };
 }
 
 // ── Installer ─────────────────────────────────────────────────────────────────

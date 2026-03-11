@@ -139,6 +139,36 @@ export async function installPlugin(
     throw err;
   }
 
+  // ── pluginApiVersion compatibility check (spec §6.4) ─────────────────────
+  // The plugin declares the minimum pluginApiVersion it requires.
+  // We read the CLI's own version from its package.json and reject plugins
+  // that require a newer API than this installation supports.
+  const pluginManifest = manifest as ModuleManifest & { pluginApiVersion?: string };
+  if (pluginManifest.pluginApiVersion) {
+    let cliVersion = "1.0.0";
+    try {
+      const { createRequire } = await import("node:module");
+      const require = createRequire(import.meta.url);
+      // Walk up to find @foundation-cli/core's package.json
+      const corePkg = require("../../../package.json") as { version?: string };
+      cliVersion = corePkg.version ?? "1.0.0";
+    } catch { /* best-effort */ }
+
+    const [reqMajor] = pluginManifest.pluginApiVersion.split(".").map(Number);
+    const [cliMajor] = cliVersion.split(".").map(Number);
+
+    if ((reqMajor ?? 0) > (cliMajor ?? 0)) {
+      await cleanupFetchTemp(fetched.tempDir);
+      throw new PluginInstallError(
+        pluginManifest.id ?? pluginName,
+        new Error(
+          `Plugin requires pluginApiVersion ${pluginManifest.pluginApiVersion} but this CLI is v${cliVersion}. ` +
+          `Run \`npm install -g @foundation-cli/cli@latest\` to upgrade.`,
+        ),
+      );
+    }
+  }
+
   const pluginId = manifest.id;
   emit(`Manifest valid: ${pluginId} v${manifest.version}`);
 

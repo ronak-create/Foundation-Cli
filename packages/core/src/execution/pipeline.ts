@@ -11,7 +11,11 @@ import type { ModuleRegistry } from "../module-registry/registry.js";
 import type { PluginHookContext } from "@foundation-cli/plugin-sdk";
 import { executeCompositionPlan } from "./project-writer.js";
 import { applyAllPatches } from "./config-merger.js";
-import { installDependencies, writeDepsToPackageJson } from "./dependency-installer.js";
+import {
+  installDependencies,
+  writeDepsToPackageJson,
+  installPythonDependencies,
+} from "./dependency-installer.js";
 import { runHooksForPlan } from "./hook-runner.js";
 import type { InstallProgress, PackageManager } from "./dependency-installer.js";
 import type { WriteResult } from "./project-writer.js";
@@ -59,6 +63,7 @@ export interface PipelineEvent {
 export interface ExecutionPipelineResult {
   readonly writeResult: WriteResult;
   readonly patchesApplied: number;
+  
   readonly installResult: {
     packageManager: string;
     installed: ReadonlyArray<string>;
@@ -111,16 +116,10 @@ export async function runExecutionPipeline(
   plan: CompositionPlan,
   options: ExecutionPipelineOptions,
 ): Promise<ExecutionPipelineResult> {
-  const {
-    targetDir,
-    registry,
-    skipInstall = false,
-    dryRun = false,
-    onProgress,
-  } = options;
+  const { targetDir, registry, skipInstall = false, dryRun = false, onProgress } = options;
 
   const ciMode = detectCiMode(options.ciMode);
-  const start  = Date.now();
+  const start = Date.now();
   const hooksExecuted: Array<{ moduleId: string; hook: string }> = [];
 
   const baseCtx: PluginHookContext = {
@@ -156,27 +155,71 @@ export async function runExecutionPipeline(
     emit(onProgress, "before-install", "Running beforeInstall hooks…");
     await runHooksForPlan("beforeInstall", plan, registry, baseCtx, { ...hookOpts, strict: false });
 
-    // ── 5. Write deps + (optionally) install ──────────────────────────────
+    // ── 5. Write deps + (optionally) install — split by runtime ───────────
     let installResult: ExecutionPipelineResult["installResult"] = null;
 
-    if (plan.dependencies.length > 0) {
+    // Partition deps: python runtime vs everything else (node / unspecified)
+    const nodeDeps = plan.dependencies.filter((d) => (d.runtime ?? "node") !== "python");
+    const pythonDeps = plan.dependencies.filter((d) => d.runtime === "python");
+
+    if (nodeDeps.length > 0) {
       emit(onProgress, "install-deps", "Writing dependencies to package.json…");
-      await writeDepsToPackageJson(targetDir, plan.dependencies);
+      await writeDepsToPackageJson(targetDir, nodeDeps);
     }
 
     if (!skipInstall) {
-      emit(onProgress, "install-deps", "Installing dependencies…");
-      const result = await installDependencies({
-        targetDir,
-        deps: plan.dependencies,
-        ...(options.packageManager !== undefined && { packageManager: options.packageManager }),
-        dryRun,
-        onProgress: (p: InstallProgress) => {
-          onProgress?.({ stage: "install-deps", message: p.message, detail: p });
-        },
-      });
-      installResult = result;
-      emit(onProgress, "install-deps", `Installed via ${result.packageManager}.`, result);
+      // Run Node and Python installs concurrently (spec §4.4)
+      const installTasks: Promise<void>[] = [];
+
+      if (nodeDeps.length > 0) {
+        emit(onProgress, "install-deps", "Installing Node packages…");
+        installTasks.push(
+          installDependencies({
+            targetDir,
+            deps: nodeDeps,
+            ...(options.packageManager !== undefined && { packageManager: options.packageManager }),
+            dryRun,
+            onProgress: (p: InstallProgress) => {
+              onProgress?.({ stage: "install-deps", message: p.message, detail: p });
+            },
+          }).then((result) => {
+            installResult = result;
+            emit(
+              onProgress,
+              "install-deps",
+              `Node packages installed via ${result.packageManager}.`,
+              result,
+            );
+          }),
+        );
+      }
+
+      if (pythonDeps.length > 0) {
+        emit(onProgress, "install-deps", "Installing Python packages…");
+        // Convert PackageDependency[] to pip requirement strings
+        const pipSpecs = pythonDeps.map(
+          (d) => `${d.name}${d.version.startsWith("^") ? `>=${d.version.slice(1)}` : d.version}`,
+        );
+        installTasks.push(
+          installPythonDependencies({
+            targetDir,
+            packages: pipSpecs,
+            dryRun,
+            onProgress: (p: InstallProgress) => {
+              onProgress?.({ stage: "install-deps", message: p.message, detail: p });
+            },
+          }).then((result) => {
+            installResult = {
+              packageManager: "pip", // Extend PackageManager or use string
+              installed: result.installed,
+              duration: result.duration,
+            };
+            emit(onProgress, "install-deps", `Python packages installed via pip.`, installResult);
+          }),
+        );
+      }
+
+      await Promise.all(installTasks);
     }
 
     // ── 6. afterInstall hooks ──────────────────────────────────────────────
@@ -193,7 +236,10 @@ export async function runExecutionPipeline(
 
     // ── Collect postInstallInstructions ───────────────────────────────────
     const postInstallInstructions = plan.orderedModules
-      .filter((m) => typeof m.postInstallInstructions === "string" && m.postInstallInstructions.length > 0)
+      .filter(
+        (m) =>
+          typeof m.postInstallInstructions === "string" && m.postInstallInstructions.length > 0,
+      )
       .map((m) => ({ moduleId: m.id, instructions: m.postInstallInstructions! }));
 
     // ── 9. Write project state ─────────────────────────────────────────────
@@ -201,11 +247,11 @@ export async function runExecutionPipeline(
     if (options.stateOptions !== undefined) {
       emit(onProgress, "write-state", "Writing project state…");
       await writeProjectState({
-        projectRoot:    targetDir,
+        projectRoot: targetDir,
         orderedModules: plan.orderedModules,
-        packageManager: installResult?.packageManager ?? options.packageManager ?? "npm",
-        projectName:    options.stateOptions.projectName,
-        selections:     options.stateOptions.selections,
+        packageManager: (installResult ?? { packageManager: options.packageManager ?? "npm" }).packageManager,
+        projectName: options.stateOptions.projectName,
+        selections: options.stateOptions.selections,
       });
       stateWritten = true;
       emit(onProgress, "write-state", "Project state written.");
