@@ -48,7 +48,7 @@ export function deepMerge(
   _path = "",
 ): MergeableObject {
   return mergeWith(
-    structuredClone(target) as MergeableObject,
+    structuredClone(target),
     source,
     (
       objValue: MergeableValue,
