@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect} from "vitest";
 import { ModuleRegistry } from "../module-registry/registry.js";
 import { resolveModules } from "../dependency-resolver/resolver.js";
 import {
