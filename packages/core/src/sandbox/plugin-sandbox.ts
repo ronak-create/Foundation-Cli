@@ -266,8 +266,8 @@ export async function executeSandboxedHook(
       reject(new SandboxTimeoutError(pluginId, timeoutMs));
     }, timeoutMs);
     // Allow the process to exit if only this timer is pending.
-    if (typeof (t as NodeJS.Timeout).unref === "function") {
-      (t as NodeJS.Timeout).unref();
+    if (typeof t.unref === "function") {
+      t.unref();
     }
   });
 
