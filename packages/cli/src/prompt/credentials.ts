@@ -388,7 +388,7 @@ export function getCredentialGroup(
   selectionValue: string,
 ): CredentialGroup | undefined {
   if (selectionValue in CREDENTIAL_MAP) {
-    return CREDENTIAL_MAP[selectionValue as keyof typeof CREDENTIAL_MAP];
+    return CREDENTIAL_MAP[selectionValue];
   }
   return undefined;
 }
