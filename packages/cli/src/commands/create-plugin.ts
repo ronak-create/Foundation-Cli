@@ -210,7 +210,7 @@ appear in \`foundation search\` results.
   process.stdout.write(`    npm run build && npm publish\n`);
   process.stdout.write("\n");
   process.stdout.write(
-    `  ${chalk.dim("Docs:")} https://foundation.build/docs/plugins/create\n\n`,
+    `  ${chalk.dim("Docs:")} https://github.com/ronak-create/Foundation-Cli/wiki\n\n`,
   );
 }
 
