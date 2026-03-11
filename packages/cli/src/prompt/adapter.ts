@@ -21,19 +21,20 @@ import type { PromptAdapter, PromptChoice } from "./graph.js";
  */
 export const inquirerAdapter: PromptAdapter = {
   async select({ message, choices, defaultValue }): Promise<string> {
-    // @inquirer/prompts select() expects a `default` key that matches a
-    // choice `value`. We map PromptChoice[] → inquirer's expected shape.
     const inquirerChoices = choices.map((c: PromptChoice) => ({
       name: formatChoiceName(c),
-      value: c.value,
+      value: c.value as string, // Assert string (matches RawSelections)
       ...(c.disabled !== undefined && { disabled: c.disabled }),
     }));
 
-    return select<string>({
+    // Type the result explicitly
+    const result = (await select({
       message,
       choices: inquirerChoices,
       ...(defaultValue !== undefined && { default: defaultValue }),
-    });
+    })) as string; // Assertion resolves 'any' from inquirer internals
+
+    return result;
   },
 
   async text({ message, defaultValue, validate, transformer }): Promise<string> {
