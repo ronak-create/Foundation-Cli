@@ -44,8 +44,11 @@ export async function runCreateCommand(): Promise<void> {
 
   // ── 3. Show loaded modules ────────────────────────────────────────────────
   printSection("Loaded Modules");
-  const builtinIds = registry.listBuiltins().map((m) => m.id).sort();
-  const pluginIds  = new Set(registry.listPlugins().map((m) => m.id));
+  const builtinIds = registry
+    .listBuiltins()
+    .map((m) => m.id)
+    .sort();
+  const pluginIds = new Set(registry.listPlugins().map((m) => m.id));
   printModuleList(builtinIds, pluginIds);
 
   if (discoveryResult !== null && discoveryResult.failed.length > 0) {
@@ -73,7 +76,7 @@ export async function runCreateCommand(): Promise<void> {
 
       if (resolution.added.length > 0) {
         resolveSpinner.text = chalk.dim(
-          `Resolving modules… ${chalk.yellow(`+${resolution.added.join(", ")}`)}`
+          `Resolving modules… ${chalk.yellow(`+${resolution.added.join(", ")}`)}`,
         );
       }
       resolveSpinner.succeed(
@@ -101,8 +104,8 @@ export async function runCreateCommand(): Promise<void> {
 
   // ── 6. Summary ────────────────────────────────────────────────────────────
   printSection("Generating Project");
-  printRow("Modules",  String(plan.orderedModules.length));
-  printRow("Files",    String(plan.files.length));
+  printRow("Modules", String(plan.orderedModules.length));
+  printRow("Files", String(plan.files.length));
   printRow("Packages", String(plan.dependencies.length));
   process.stdout.write("\n");
 
@@ -124,10 +127,7 @@ export async function runCreateCommand(): Promise<void> {
     ).map((f) => ({ relativePath: f.relativePath, content: f.content })),
     configPatches: plan.configPatches.map((patch) => ({
       ...patch,
-      merge: renderTemplateValues(
-        patch.merge as Record<string, unknown>,
-        templateVars,
-      ),
+      merge: renderTemplateValues(patch.merge, templateVars),
     })),
   };
 
@@ -162,7 +162,7 @@ export async function runCreateCommand(): Promise<void> {
       },
       stateOptions: {
         projectName: selection.projectName,
-        selections: selection.rawSelections as unknown as Record<string, string>,
+        selections: Object.fromEntries(Object.entries(selection.rawSelections)),
       },
       onProgress: (event: PipelineEvent) => handler(event),
     });
@@ -189,7 +189,7 @@ async function writeBaseFiles(
   projectName: string,
   selections: UserRawSelections,
 ): Promise<void> {
-  const fs   = await import("node:fs/promises");
+  const fs = await import("node:fs/promises");
   const path = await import("node:path");
 
   const write = async (rel: string, content: string): Promise<void> => {
@@ -211,10 +211,10 @@ async function writeBaseFiles(
         private: true,
         type: "module",
         scripts: {
-          dev:   "echo 'Configure dev script'",
+          dev: "echo 'Configure dev script'",
           build: "echo 'Configure build script'",
           start: "echo 'Configure start script'",
-          lint:  "eslint .",
+          lint: "eslint .",
         },
       },
       null,
@@ -222,7 +222,7 @@ async function writeBaseFiles(
     ),
   );
 
-  await write("README.md",  buildReadme(projectName, selections));
+  await write("README.md", buildReadme(projectName, selections));
   await write(".gitignore", BASE_GITIGNORE);
   await write(
     ".eslintrc.json",
@@ -241,22 +241,22 @@ async function writeBaseFiles(
 }
 
 type UserRawSelections = {
-  frontend:        string;
-  backend:         string;
-  database:        string;
-  auth:            string;
-  ui:              string;
+  frontend: string;
+  backend: string;
+  database: string;
+  auth: string;
+  ui: string;
   stateManagement: string;
-  deployment:      string;
+  deployment: string;
 };
 
 function buildReadme(projectName: string, s: UserRawSelections): string {
   const stack = [
-    s.frontend   !== "none" && `- **Frontend:** ${s.frontend}`,
-    s.backend    !== "none" && `- **Backend:** ${s.backend}`,
-    s.database   !== "none" && `- **Database:** ${s.database}`,
-    s.auth       !== "none" && `- **Auth:** ${s.auth}`,
-    s.ui         !== "none" && `- **UI:** ${s.ui}`,
+    s.frontend !== "none" && `- **Frontend:** ${s.frontend}`,
+    s.backend !== "none" && `- **Backend:** ${s.backend}`,
+    s.database !== "none" && `- **Database:** ${s.database}`,
+    s.auth !== "none" && `- **Auth:** ${s.auth}`,
+    s.ui !== "none" && `- **UI:** ${s.ui}`,
     s.deployment !== "none" && `- **Deployment:** ${s.deployment}`,
   ]
     .filter(Boolean)
@@ -294,16 +294,17 @@ Thumbs.db
 .idea/
 `;
 
-function renderTemplateValues(
-  obj: Record<string, unknown>,
-  vars: Record<string, string>,
-): Record<string, unknown> {
+function renderTemplateValues(obj: unknown, vars: Record<string, string>): Record<string, unknown> {
+  if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
+    return {};
+  }
+
   const result: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(obj)) {
+  for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
     if (typeof value === "string") {
       result[key] = value.replace(/<%=\s*(\w+)\s*%>/g, (_, name: string) => vars[name] ?? _);
     } else if (value !== null && typeof value === "object" && !Array.isArray(value)) {
-      result[key] = renderTemplateValues(value as Record<string, unknown>, vars);
+      result[key] = renderTemplateValues(value, vars);
     } else {
       result[key] = value;
     }
