@@ -23,53 +23,53 @@ import { QUESTIONS } from "../prompt/questions.js";
  * Builds a PromptAdapter stub that answers every question with a preset map.
  * Falls back to the node's defaultValue when no answer is specified.
  */
-function makeAdapter(answers: Record<string, string> = {}): PromptAdapter {
-  return {
-    async select({ message, choices, defaultValue }) {
-      // Find the nodeId from the message text (heuristic for tests).
-      const entry = Object.entries(answers).find(([, v]) =>
-        choices.some((c) => c.value === v),
-      );
-      if (entry) return entry[1];
-      return defaultValue ?? choices[0]?.value ?? "none";
-    },
+// function makeAdapter(answers: Record<string, string> = {}): PromptAdapter {
+//   return {
+//     async select({ message, choices, defaultValue }) {
+//       // Find the nodeId from the message text (heuristic for tests).
+//       const entry = Object.entries(answers).find(([, v]) =>
+//         choices.some((c) => c.value === v),
+//       );
+//       if (entry) return entry[1];
+//       return defaultValue ?? choices[0]?.value ?? "none";
+//     },
 
-    async text({ defaultValue }) {
-      // For text prompts (projectName) return the override or the default.
-      const textAnswer = answers["projectName"];
-      return textAnswer ?? defaultValue ?? "my-app";
-    },
+//     async text({ defaultValue }) {
+//       // For text prompts (projectName) return the override or the default.
+//       const textAnswer = answers["projectName"];
+//       return textAnswer ?? defaultValue ?? "my-app";
+//     },
 
-    async confirm({ defaultValue }) {
-      return defaultValue ?? true;
-    },
-  };
-}
+//     async confirm({ defaultValue }) {
+//       return defaultValue ?? true;
+//     },
+//   };
+// }
 
 /**
  * Builds a deterministic adapter driven by a nodeId → value map.
  * Uses the graph's own node IDs so tests are not coupled to message text.
  */
-function makeNodeAdapter(nodeAnswers: Record<string, string>): PromptAdapter {
-  return {
-    async select({ choices, defaultValue }) {
-      // Return first matching value found in nodeAnswers
-      for (const value of Object.values(nodeAnswers)) {
-        if (choices.some((c) => c.value === value)) return value;
-      }
-      return defaultValue ?? choices[0]?.value ?? "none";
-    },
-    async text({ defaultValue }) {
-      return nodeAnswers["projectName"] ?? defaultValue ?? "my-app";
-    },
-    async confirm({ defaultValue }) {
-      const raw = nodeAnswers["confirm"];
-      if (raw === "false") return false;
-      if (raw === "true") return true;
-      return defaultValue ?? true;
-    },
-  };
-}
+// function makeNodeAdapter(nodeAnswers: Record<string, string>): PromptAdapter {
+//   return {
+//     async select({ choices, defaultValue }) {
+//       // Return first matching value found in nodeAnswers
+//       for (const value of Object.values(nodeAnswers)) {
+//         if (choices.some((c) => c.value === value)) return value;
+//       }
+//       return defaultValue ?? choices[0]?.value ?? "none";
+//     },
+//     async text({ defaultValue }) {
+//       return nodeAnswers["projectName"] ?? defaultValue ?? "my-app";
+//     },
+//     async confirm({ defaultValue }) {
+//       const raw = nodeAnswers["confirm"];
+//       if (raw === "false") return false;
+//       if (raw === "true") return true;
+//       return defaultValue ?? true;
+//     },
+//   };
+// }
 
 /**
  * Builds an adapter that maps node IDs precisely by intercepting the graph's
@@ -814,7 +814,7 @@ describe("PromptAdapter interface contract", () => {
     const validateFn = vi.fn((v: string) => (v.length > 0 ? true : "Required"));
     const adapter: PromptAdapter = {
       async select() { return "none"; },
-      async text(opts) {
+      async text() {
         // Simulate adapter calling validate
         // const result = opts.validate?.("test-value");
         // expect(result).toBe(true);
