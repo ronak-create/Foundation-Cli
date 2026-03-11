@@ -39,7 +39,7 @@ export interface ParsedRequirement {
 const COMMENT_RE = /^\s*#/;
 const BLANK_RE   = /^\s*$/;
 // Matches: package_name[extras]  op  version  (op is ==, >=, <=, !=, ~=, >  <)
-const REQ_RE = /^([A-Za-z0-9_.\-\[\]]+)\s*((?:[><=!~]{1,2}[A-Za-z0-9.*+\-]+,?\s*)+)?(.*)$/;
+const REQ_RE = /^([A-Za-z0-9_.[-\]]+)\s*((?:[><=!~]{1,2}[A-Za-z0-9.*+-]+,?\s*)+)?(.*)$/;
 
 /**
  * Parses a requirements.txt string into structured entries.
