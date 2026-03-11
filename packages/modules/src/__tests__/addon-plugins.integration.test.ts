@@ -333,7 +333,7 @@ describe("addon plugins — hook sources", () => {
 
   it("hook sources do not use require('fs') — would throw in sandbox", async () => {
     // Verify none of the hooks attempt to access blocked modules
-    for (const [name, source] of [
+    for (const [source] of [
       ["stripe", STRIPE_AFTER_WRITE_HOOK],
       ["redis", REDIS_AFTER_WRITE_HOOK],
       ["openai", OPENAI_AFTER_WRITE_HOOK],
