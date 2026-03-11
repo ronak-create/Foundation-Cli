@@ -37,11 +37,12 @@
  */
 
 import fs from "node:fs/promises";
+import type { Dirent } from "node:fs";
 import path from "node:path";
 // import { pathToFileURL } from "node:url";
-import type { PluginDefinition, PluginFactory, ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition, PluginFactory } from "@foundation-cli/plugin-sdk";
 import { ManifestValidator } from "../manifest-validator/validator.js";
-import { ModuleRegistry } from "./registry.js";
+import type { ModuleRegistry } from "./registry.js";
 import type { SandboxedHooks } from "../plugin-installer/plugin-installer.js";
 
 // ── Public types ──────────────────────────────────────────────────────────────
@@ -163,7 +164,7 @@ async function attemptLoad(
   if (isPluginFactory(def)) {
     let plugin: PluginDefinition;
     try {
-      plugin = (def as PluginFactory)();
+      plugin = def();
     } catch (err) {
       return { status: "failed", error: err as Error, filePath: entryPath };
     }
@@ -204,7 +205,7 @@ async function attemptLoadManifestDir(
     return { status: "failed", error: err as Error, filePath: dirPath };
   }
 
-  const manifest = rawManifest as ModuleManifest;
+  const manifest = rawManifest;
   if (registry.hasModule(manifest.id)) {
     return { status: "skipped", reason: "duplicate", filePath: dirPath };
   }
@@ -288,7 +289,7 @@ export async function discoverFlat(
   registry: ModuleRegistry,
   source: "builtin" | "plugin" = "builtin",
 ): Promise<DiscoveryResult> {
-  let entries: import("fs").Dirent[];
+  let entries: Dirent[];
   try {
     entries = await fs.readdir(dir, { withFileTypes: true });
   } catch (err) {
@@ -326,7 +327,7 @@ export async function discoverByCategory(
   source: "builtin" | "plugin" = "builtin",
   skipDirs: ReadonlyArray<string> = ["addon"],
 ): Promise<DiscoveryResult> {
-  let topEntries: import("fs").Dirent[];
+  let topEntries: Dirent[];
   try {
     topEntries = await fs.readdir(rootDir, { withFileTypes: true });
   } catch (err) {
@@ -344,7 +345,7 @@ export async function discoverByCategory(
     if (skipDirs.includes(topEntry.name)) continue;
 
     const catDir = path.join(rootDir, topEntry.name);
-    let catEntries: import("fs").Dirent[];
+    let catEntries: Dirent[];
     try {
       catEntries = await fs.readdir(catDir, { withFileTypes: true });
     } catch {
@@ -383,7 +384,7 @@ async function walkDir(
   source: "builtin" | "plugin",
   outcomes: LoadOutcome[],
 ): Promise<void> {
-  let entries: import("fs").Dirent[];
+  let entries: Dirent[];
   try {
     entries = await fs.readdir(dir, { withFileTypes: true });
   } catch {
