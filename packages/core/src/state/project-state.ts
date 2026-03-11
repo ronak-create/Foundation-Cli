@@ -15,10 +15,10 @@ import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-export const FOUNDATION_DIR = ".foundation" as const;
-export const LOCKFILE_NAME = "project.lock" as const;
-export const CONFIG_NAME = "foundation.config.json" as const;
-export const FOUNDATION_CLI_VERSION = "0.0.1" as const;
+export const FOUNDATION_DIR = ".foundation";
+export const LOCKFILE_NAME = "project.lock";
+export const CONFIG_NAME = "foundation.config.json";
+export const FOUNDATION_CLI_VERSION = "0.0.1";
 
 export { StateWriteError, StateReadError };
 
@@ -253,7 +253,7 @@ function parseConfig(raw: string): FoundationConfig | null {
     return {
       projectName: parsed.projectName,
       createdAt: parsed.createdAt,
-      selections: parsed.selections as ProjectSelections,
+      selections: parsed.selections,
       plugins: Array.isArray(parsed.plugins)
         ? (parsed.plugins as string[])
         : [],
