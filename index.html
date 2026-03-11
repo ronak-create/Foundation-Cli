@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foundation CLI — Full-Stack Project Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Syne', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            zinc: {
+              950: '#0a0a0f',
+            }
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.6s ease forwards',
+            'glow-pulse': 'glowPulse 3s ease-in-out infinite',
+            'blink': 'blink 1s step-end infinite',
+            'slide-in': 'slideIn 0.4s ease forwards',
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(24px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            glowPulse: {
+              '0%, 100%': { boxShadow: '0 0 20px rgba(99,102,241,0.3), 0 0 60px rgba(99,102,241,0.1)' },
+              '50%': { boxShadow: '0 0 40px rgba(99,102,241,0.6), 0 0 100px rgba(99,102,241,0.2)' },
+            },
+            blink: {
+              '0%, 100%': { opacity: '1' },
+              '50%': { opacity: '0' },
+            },
+            slideIn: {
+              '0%': { opacity: '0', transform: 'translateX(-10px)' },
+              '100%': { opacity: '1', transform: 'translateX(0)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #08080d;
+      --surface: #0e0e16;
+      --surface2: #13131e;
+      --border: rgba(255,255,255,0.06);
+      --border-bright: rgba(255,255,255,0.12);
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --accent3: #06b6d4;
+      --green: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--bg); }
+    body {
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      overflow-x: hidden;
+    }
+
+    /* ── Background ── */
+    .bg-grid {
+      background-image:
+        linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .noise::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ── Hero orbs ── */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%);
+      top: -200px; left: -100px;
+    }
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(139,92,246,0.14) 0%, transparent 70%);
+      top: 100px; right: -150px;
+    }
+    .orb-3 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%);
+      bottom: -100px; left: 30%;
+    }
+
+    /* ── Glow button ── */
+    .btn-primary {
+      position: relative;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+      padding: 0.75rem 1.75rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 30px rgba(99,102,241,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 50px rgba(99,102,241,0.55), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .btn-secondary {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+      padding: 0.75rem 1.75rem;
+      border-radius: 10px;
+      border: 1px solid var(--border-bright);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      backdrop-filter: blur(10px);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.22);
+      transform: translateY(-2px);
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(99,102,241,0.04) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: inherit;
+    }
+    .card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(99,102,241,0.1);
+    }
+    .card:hover::before { opacity: 1; }
+
+    /* ── Terminal ── */
+    .terminal {
+      background: #0c0c14;
+      border: 1px solid var(--border-bright);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.08);
+    }
+    .terminal-bar {
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .terminal-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+    .terminal-body {
+      padding: 1.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.9;
+    }
+
+    /* ── Code block ── */
+    .code-block {
+      background: #0c0c14;
+      border: 1px solid var(--border-bright);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .code-header {
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .code-body {
+      padding: 1.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 2;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(8,8,13,0.7);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    /* ── Section labels ── */
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    /* ── Intersection Observer reveals ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+    .reveal-delay-6 { transition-delay: 0.6s; }
+
+    /* ── Icon boxes ── */
+    .icon-box {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Module tags ── */
+    .module-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.35rem 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+      transition: all 0.2s ease;
+    }
+    .module-tag:hover {
+      background: rgba(99,102,241,0.1);
+      border-color: rgba(99,102,241,0.3);
+      color: var(--text);
+    }
+
+    /* ── Arch nodes ── */
+    .arch-node {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.3s ease;
+    }
+    .arch-node:hover {
+      border-color: rgba(99,102,241,0.3);
+      background: rgba(99,102,241,0.05);
+    }
+    .arch-arrow {
+      color: var(--muted);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.4); border-radius: 99px; }
+
+    /* ── Hero badge ── */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 99px;
+      padding: 0.35rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #a5b4fc;
+      margin-bottom: 2rem;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+
+    /* ── Gradient text ── */
+    .gradient-text {
+      background: linear-gradient(135deg, #e0e0f0 0%, #a5b4fc 50%, #c4b5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Terminal typing animation ── */
+    .terminal-line { opacity: 0; }
+    .terminal-line.show { animation: slideIn 0.3s ease forwards; }
+
+    /* ── Responsive hero text ── */
+    .hero-title {
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+  </style>
+</head>
+<body class="noise">
+
+<!-- ══════════════════ NAV ══════════════════ -->
+<nav id="navbar">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2.5 no-underline">
+      <div style="width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="2" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+          <rect x="9" y="2" width="5" height="5" rx="1" fill="white" opacity="0.6"/>
+          <rect x="2" y="9" width="5" height="5" rx="1" fill="white" opacity="0.6"/>
+          <rect x="9" y="9" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+        </svg>
+      </div>
+      <span style="font-weight:700;font-size:1rem;letter-spacing:-0.01em;">Foundation CLI</span>
+    </a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#features" class="text-sm no-underline transition-colors duration-200" style="color:var(--muted);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Features</a>
+      <a href="#demo" class="text-sm no-underline transition-colors duration-200" style="color:var(--muted);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Demo</a>
+      <a href="#modules" class="text-sm no-underline transition-colors duration-200" style="color:var(--muted);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Modules</a>
+      <a href="#architecture" class="text-sm no-underline transition-colors duration-200" style="color:var(--muted);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Architecture</a>
+    </div>
+    <div class="hidden md:flex items-center gap-3">
+      <a href="https://github.com" target="_blank" class="btn-secondary" style="padding:0.5rem 1.1rem;font-size:0.82rem;">
+        <svg style="display:inline;vertical-align:-2px;margin-right:6px;" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+    <!-- Mobile menu btn -->
+    <button id="mobile-menu-btn" class="md:hidden" style="color:var(--muted);background:none;border:none;cursor:pointer;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+  <!-- Mobile nav -->
+  <div id="mobile-nav" class="hidden md:hidden" style="border-top:1px solid var(--border);padding:1rem 1.5rem;display:none;flex-direction:column;gap:1rem;">
+    <a href="#features" class="text-sm no-underline" style="color:var(--muted);">Features</a>
+    <a href="#demo" class="text-sm no-underline" style="color:var(--muted);">Demo</a>
+    <a href="#modules" class="text-sm no-underline" style="color:var(--muted);">Modules</a>
+    <a href="#architecture" class="text-sm no-underline" style="color:var(--muted);">Architecture</a>
+    <a href="https://github.com" target="_blank" class="btn-secondary" style="width:fit-content;font-size:0.82rem;">GitHub</a>
+  </div>
+</nav>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<section id="hero" class="relative min-h-screen flex items-center justify-center bg-grid overflow-hidden" style="padding-top:80px;">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="max-w-5xl mx-auto px-6 py-24 text-center relative z-10">
+    <div class="hero-badge reveal">
+      <span class="dot"></span>
+      v1.0 · Now Available
+    </div>
+
+    <h1 class="hero-title gradient-text reveal" style="margin-bottom:1.5rem;">
+      Scaffold full-stack<br/>projects instantly
+    </h1>
+
+    <p class="reveal reveal-delay-1 mx-auto" style="max-width:560px;font-size:1.1rem;line-height:1.7;color:var(--muted);margin-bottom:2.5rem;">
+      Foundation CLI generates production-ready full-stack applications using a modular architecture. Pick your stack, configure your modules — project ready in seconds.
+    </p>
+
+    <!-- Install hint -->
+    <div class="reveal reveal-delay-2 inline-flex items-center gap-3 mx-auto" style="background:var(--surface);border:1px solid var(--border-bright);border-radius:10px;padding:0.6rem 1.1rem;margin-bottom:2.5rem;font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--muted);">
+      <span style="color:var(--accent);">$</span>
+      <span style="color:var(--text);">npm install -g foundation-cli</span>
+      <button onclick="navigator.clipboard.writeText('npm install -g foundation-cli')" title="Copy" style="background:none;border:none;cursor:pointer;color:var(--muted);transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+    </div>
+
+    <div class="reveal reveal-delay-3 flex flex-wrap gap-4 justify-center">
+      <a href="#demo" class="btn-primary">
+        Get Started
+        <svg style="display:inline;vertical-align:-2px;margin-left:6px;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="https://github.com" target="_blank" class="btn-secondary">
+        <svg style="display:inline;vertical-align:-2px;margin-right:6px;" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+
+    <!-- Stat row -->
+    <div class="reveal reveal-delay-4 flex flex-wrap justify-center gap-8 mt-16" style="padding-top:2rem;border-top:1px solid var(--border);">
+      <div class="text-center">
+        <div style="font-size:1.75rem;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#e0e0f0,#a5b4fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">30+</div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Built-in Modules</div>
+      </div>
+      <div style="width:1px;background:var(--border);height:48px;align-self:center;"></div>
+      <div class="text-center">
+        <div style="font-size:1.75rem;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#e0e0f0,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">7</div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Stack Categories</div>
+      </div>
+      <div style="width:1px;background:var(--border);height:48px;align-self:center;"></div>
+      <div class="text-center">
+        <div style="font-size:1.75rem;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#e0e0f0,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">&lt;5s</div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Project Generation</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ FEATURES ══════════════════ -->
+<section id="features" style="padding:6rem 0;">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-16 reveal">
+      <div class="section-label">Capabilities</div>
+      <h2 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-0.025em;line-height:1.15;">
+        Everything you need to<br/><span class="gradient-text">ship faster</span>
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <!-- Card 1 -->
+      <div class="card reveal reveal-delay-1">
+        <div class="icon-box" style="background:rgba(99,102,241,0.12);">🧩</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Modular Architecture</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">Every stack component is an isolated module. Mix and match frontend, backend, database, and auth layers with zero conflicts.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">composable</span>
+          <span class="module-tag">tree-shaking</span>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="card reveal reveal-delay-2">
+        <div class="icon-box" style="background:rgba(139,92,246,0.12);">🔌</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Plugin Ecosystem</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">Extend Foundation with community plugins published to npm. Install, validate, and sandbox third-party modules safely.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">npm registry</span>
+          <span class="module-tag">sandboxed</span>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="card reveal reveal-delay-3">
+        <div class="icon-box" style="background:rgba(6,182,212,0.12);">⚡</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Dependency Resolution</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">Automatic conflict detection and topological sort ensures modules are installed in the right order without breaking changes.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">DAG resolver</span>
+          <span class="module-tag">conflict-free</span>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="card reveal reveal-delay-1">
+        <div class="icon-box" style="background:rgba(16,185,129,0.12);">🏗️</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Full-Stack Scaffolding</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">Generates complete project structures: directory layout, config files, environment variables, and boilerplate — all wired up.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">ejs templates</span>
+          <span class="module-tag">config-merge</span>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="card reveal reveal-delay-2">
+        <div class="icon-box" style="background:rgba(245,158,11,0.12);">🚀</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Deployment Ready</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">First-class support for Docker, Vercel, Render, and AWS. CI/CD pipelines included in the generated output.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">Docker</span>
+          <span class="module-tag">GitHub Actions</span>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="card reveal reveal-delay-3">
+        <div class="icon-box" style="background:rgba(236,72,153,0.12);">🪝</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Extensible Hooks</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">Lifecycle hooks let modules run custom logic before and after file writes — post-processing, validation, or dynamic config patching.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">beforeWrite</span>
+          <span class="module-tag">afterWrite</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ EXAMPLE STACK ══════════════════ -->
+<section id="stack" style="padding:4rem 0 6rem;">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+      <div class="reveal">
+        <div class="section-label">Example Output</div>
+        <h2 style="font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-0.025em;line-height:1.15;margin-bottom:1rem;">
+          Your perfect stack,<br/><span class="gradient-text">generated in seconds</span>
+        </h2>
+        <p style="font-size:0.92rem;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;">
+          Foundation reads your selections and produces a fully-wired monorepo with all config files, shared types, and deployment targets ready to go.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:0.6rem;">
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--muted);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+            No manual wiring — everything is pre-configured
+          </div>
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--muted);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+            Shared TypeScript types across frontend & backend
+          </div>
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--muted);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+            .env files with the right variables for your stack
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-2">
+        <div class="code-block">
+          <div class="code-header">
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <div class="terminal-dot" style="background:#ff5f57;"></div>
+              <div class="terminal-dot" style="background:#febc2e;"></div>
+              <div class="terminal-dot" style="background:#28c840;"></div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);">foundation.config.json</span>
+            <div style="width:48px;"></div>
+          </div>
+          <div class="code-body">
+            <div style="color:var(--muted);">// Generated stack configuration</div>
+            <div>{</div>
+            <div style="padding-left:1.5rem;">
+              <span style="color:#a5b4fc;">"projectName"</span><span>: </span><span style="color:#86efac;">"my-app"</span><span>,</span>
+            </div>
+            <div style="padding-left:1.5rem;">
+              <span style="color:#a5b4fc;">"selections"</span><span>: {</span>
+            </div>
+            <div style="padding-left:3rem;">
+              <span style="color:#a5b4fc;">"frontend"</span><span>:  </span><span style="color:#86efac;">"nextjs"</span><span>,</span>
+            </div>
+            <div style="padding-left:3rem;">
+              <span style="color:#a5b4fc;">"backend"</span><span>:   </span><span style="color:#86efac;">"express"</span><span>,</span>
+            </div>
+            <div style="padding-left:3rem;">
+              <span style="color:#a5b4fc;">"database"</span><span>:  </span><span style="color:#86efac;">"postgresql"</span><span>,</span>
+            </div>
+            <div style="padding-left:3rem;">
+              <span style="color:#a5b4fc;">"auth"</span><span>:      </span><span style="color:#86efac;">"jwt"</span><span>,</span>
+            </div>
+            <div style="padding-left:3rem;">
+              <span style="color:#a5b4fc;">"ui"</span><span>:        </span><span style="color:#86efac;">"shadcn"</span><span>,</span>
+            </div>
+            <div style="padding-left:3rem;">
+              <span style="color:#a5b4fc;">"deployment"</span><span>: </span><span style="color:#86efac;">"docker"</span>
+            </div>
+            <div style="padding-left:1.5rem;"><span>}</span></div>
+            <div>}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ CLI DEMO ══════════════════ -->
+<section id="demo" style="padding:5rem 0;background:linear-gradient(180deg,transparent,rgba(99,102,241,0.03),transparent);">
+  <div class="max-w-3xl mx-auto px-6">
+    <div class="text-center mb-12 reveal">
+      <div class="section-label">Live Demo</div>
+      <h2 style="font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-0.025em;line-height:1.15;">
+        See it in <span class="gradient-text">action</span>
+      </h2>
+      <p style="font-size:0.92rem;color:var(--muted);margin-top:0.75rem;">Interactive prompt-driven project generation</p>
+    </div>
+
+    <div class="terminal reveal reveal-delay-1" id="terminal-box">
+      <div class="terminal-bar">
+        <div class="terminal-dot" style="background:#ff5f57;"></div>
+        <div class="terminal-dot" style="background:#febc2e;"></div>
+        <div class="terminal-dot" style="background:#28c840;"></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);margin-left:0.5rem;">bash — foundation</span>
+        <button id="replay-btn" onclick="startTerminalAnimation()" style="margin-left:auto;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;padding:0.2rem 0.6rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--muted);cursor:pointer;">↺ replay</button>
+      </div>
+      <div class="terminal-body" id="terminal-body">
+        <!-- Lines injected by JS -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ MODULE ECOSYSTEM ══════════════════ -->
+<section id="modules" style="padding:6rem 0;">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-16 reveal">
+      <div class="section-label">Module Ecosystem</div>
+      <h2 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-0.025em;line-height:1.15;">
+        All the pieces of your stack,<br/><span class="gradient-text">ready to compose</span>
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+
+      <!-- Frontend -->
+      <div class="card reveal reveal-delay-1">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div class="icon-box" style="background:rgba(99,102,241,0.12);margin-bottom:0;width:36px;height:36px;font-size:1rem;">⚛️</div>
+          <span style="font-size:0.82rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);">Frontend</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+          <span class="module-tag" style="justify-content:space-between;"><span>Next.js</span><span style="color:var(--accent);font-size:0.68rem;">popular</span></span>
+          <span class="module-tag">React + Vite</span>
+          <span class="module-tag">Vue 3</span>
+          <span class="module-tag">Svelte</span>
+        </div>
+      </div>
+
+      <!-- Backend -->
+      <div class="card reveal reveal-delay-2">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div class="icon-box" style="background:rgba(16,185,129,0.12);margin-bottom:0;width:36px;height:36px;font-size:1rem;">⚙️</div>
+          <span style="font-size:0.82rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);">Backend</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+          <span class="module-tag">Express</span>
+          <span class="module-tag">NestJS</span>
+          <span class="module-tag">FastAPI</span>
+          <span class="module-tag">Django</span>
+        </div>
+      </div>
+
+      <!-- Database -->
+      <div class="card reveal reveal-delay-3">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div class="icon-box" style="background:rgba(6,182,212,0.12);margin-bottom:0;width:36px;height:36px;font-size:1rem;">🗄️</div>
+          <span style="font-size:0.82rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);">Database</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+          <span class="module-tag">PostgreSQL</span>
+          <span class="module-tag">MySQL</span>
+          <span class="module-tag">MongoDB</span>
+          <span class="module-tag">Supabase</span>
+          <span class="module-tag">SQLite</span>
+        </div>
+      </div>
+
+      <!-- Auth -->
+      <div class="card reveal reveal-delay-4">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div class="icon-box" style="background:rgba(245,158,11,0.12);margin-bottom:0;width:36px;height:36px;font-size:1rem;">🔐</div>
+          <span style="font-size:0.82rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);">Auth</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+          <span class="module-tag">JWT</span>
+          <span class="module-tag">OAuth</span>
+          <span class="module-tag">Clerk</span>
+          <span class="module-tag">Auth0</span>
+          <span class="module-tag">Session</span>
+        </div>
+      </div>
+
+      <!-- UI -->
+      <div class="card reveal reveal-delay-1">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div class="icon-box" style="background:rgba(236,72,153,0.12);margin-bottom:0;width:36px;height:36px;font-size:1rem;">🎨</div>
+          <span style="font-size:0.82rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);">UI Systems</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+          <span class="module-tag">Tailwind CSS</span>
+          <span class="module-tag">ShadCN/UI</span>
+          <span class="module-tag">Material UI</span>
+          <span class="module-tag">Chakra UI</span>
+          <span class="module-tag">Bootstrap</span>
+        </div>
+      </div>
+
+      <!-- State -->
+      <div class="card reveal reveal-delay-2">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div class="icon-box" style="background:rgba(139,92,246,0.12);margin-bottom:0;width:36px;height:36px;font-size:1rem;">🔄</div>
+          <span style="font-size:0.82rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);">State Mgmt</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+          <span class="module-tag">Zustand</span>
+          <span class="module-tag">Redux Toolkit</span>
+          <span class="module-tag">TanStack Query</span>
+        </div>
+      </div>
+
+      <!-- Deployment -->
+      <div class="card reveal reveal-delay-3">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div class="icon-box" style="background:rgba(16,185,129,0.12);margin-bottom:0;width:36px;height:36px;font-size:1rem;">🚀</div>
+          <span style="font-size:0.82rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);">Deployment</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+          <span class="module-tag">Docker</span>
+          <span class="module-tag">Vercel</span>
+          <span class="module-tag">Render</span>
+          <span class="module-tag">AWS ECS</span>
+        </div>
+      </div>
+
+      <!-- Addons -->
+      <div class="card reveal reveal-delay-4" style="border-style:dashed;">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div class="icon-box" style="background:rgba(255,255,255,0.05);margin-bottom:0;width:36px;height:36px;font-size:1rem;">➕</div>
+          <span style="font-size:0.82rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);">Add-ons</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+          <span class="module-tag">OpenAI</span>
+          <span class="module-tag">Redis</span>
+          <span class="module-tag">Stripe</span>
+          <span class="module-tag" style="color:var(--accent);border-color:rgba(99,102,241,0.3);">+ community plugins</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ ARCHITECTURE ══════════════════ -->
+<section id="architecture" style="padding:5rem 0 7rem;background:linear-gradient(180deg,transparent,rgba(99,102,241,0.02),transparent);">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="text-center mb-16 reveal">
+      <div class="section-label">Under the Hood</div>
+      <h2 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-0.025em;line-height:1.15;">
+        A pipeline built for<br/><span class="gradient-text">reliability</span>
+      </h2>
+      <p style="font-size:0.92rem;color:var(--muted);margin-top:0.75rem;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.7;">
+        Every project generation runs through a deterministic four-stage pipeline that guarantees reproducibility.
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr;gap:1rem;max-width:680px;margin:0 auto;" class="reveal reveal-delay-1">
+
+      <div class="arch-node">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">📦</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:0.95rem;letter-spacing:-0.01em;">Module Registry</div>
+          <div style="font-size:0.82rem;color:var(--muted);margin-top:0.2rem;">Loads, validates, and indexes all built-in and plugin modules. Manifest schema enforced via AJV.</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--accent);background:rgba(99,102,241,0.1);padding:0.2rem 0.5rem;border-radius:5px;flex-shrink:0;">01</div>
+      </div>
+
+      <div style="display:flex;justify-content:center;color:var(--muted);">
+        <svg width="16" height="24" viewBox="0 0 16 24" fill="none"><path d="M8 0v20M2 14l6 8 6-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <div class="arch-node">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">🔍</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:0.95rem;letter-spacing:-0.01em;">Dependency Resolver</div>
+          <div style="font-size:0.82rem;color:var(--muted);margin-top:0.2rem;">Builds a DAG of selected modules, detects conflicts, resolves implicit requirements, and topologically sorts.</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#a78bfa;background:rgba(139,92,246,0.1);padding:0.2rem 0.5rem;border-radius:5px;flex-shrink:0;">02</div>
+      </div>
+
+      <div style="display:flex;justify-content:center;color:var(--muted);">
+        <svg width="16" height="24" viewBox="0 0 16 24" fill="none"><path d="M8 0v20M2 14l6 8 6-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <div class="arch-node">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(6,182,212,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">🗺️</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:0.95rem;letter-spacing:-0.01em;">Composition Planner</div>
+          <div style="font-size:0.82rem;color:var(--muted);margin-top:0.2rem;">Merges file trees, resolves config patches, and plans the final project structure before touching disk.</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#67e8f9;background:rgba(6,182,212,0.1);padding:0.2rem 0.5rem;border-radius:5px;flex-shrink:0;">03</div>
+      </div>
+
+      <div style="display:flex;justify-content:center;color:var(--muted);">
+        <svg width="16" height="24" viewBox="0 0 16 24" fill="none"><path d="M8 0v20M2 14l6 8 6-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <div class="arch-node" style="border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.04);">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">⚡</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:0.95rem;letter-spacing:-0.01em;">Execution Pipeline</div>
+          <div style="font-size:0.82rem;color:var(--muted);margin-top:0.2rem;">Renders templates, writes files atomically, runs lifecycle hooks, and installs npm/pip dependencies.</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#34d399;background:rgba(16,185,129,0.1);padding:0.2rem 0.5rem;border-radius:5px;flex-shrink:0;">04</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer style="border-top:1px solid var(--border);padding:3rem 0;">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+
+      <div class="flex items-center gap-3">
+        <div style="width:30px;height:30px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:7px;display:flex;align-items:center;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="2" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+            <rect x="9" y="2" width="5" height="5" rx="1" fill="white" opacity="0.6"/>
+            <rect x="2" y="9" width="5" height="5" rx="1" fill="white" opacity="0.6"/>
+            <rect x="9" y="9" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+          </svg>
+        </div>
+        <span style="font-weight:700;font-size:0.9rem;">Foundation CLI</span>
+        <span style="font-size:0.78rem;color:var(--muted);">— MIT License</span>
+      </div>
+
+      <div class="flex items-center gap-6 flex-wrap justify-center">
+        <a href="https://github.com" target="_blank" style="font-size:0.85rem;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:0.4rem;transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub Repository
+        </a>
+        <a href="https://github.com/wiki" target="_blank" style="font-size:0.85rem;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:0.4rem;transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+          Documentation
+        </a>
+        <a href="https://github.com/blob/main/LICENSE" target="_blank" style="font-size:0.85rem;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:0.4rem;transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          MIT License
+        </a>
+      </div>
+
+      <div style="font-size:0.78rem;color:var(--muted);">
+        Built with Foundation CLI
+      </div>
+
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════ JAVASCRIPT ══════════════════ -->
+<script>
+  // ── Mobile nav toggle ──
+  const mobileBtn = document.getElementById('mobile-menu-btn');
+  const mobileNav = document.getElementById('mobile-nav');
+  let mobileOpen = false;
+  mobileBtn.addEventListener('click', () => {
+    mobileOpen = !mobileOpen;
+    mobileNav.style.display = mobileOpen ? 'flex' : 'none';
+  });
+  mobileNav.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => { mobileOpen = false; mobileNav.style.display = 'none'; });
+  });
+
+  // ── Smooth scroll for nav links ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+
+  // ── Intersection observer for reveals ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── Terminal animation ──
+  const terminalLines = [
+    { text: '$ foundation create my-app', color: '#a5b4fc', delay: 0 },
+    { text: '', delay: 200 },
+    { text: '  ╔══════════════════════════════╗', color: '#6366f1', delay: 350 },
+    { text: '  ║      Foundation CLI v1.0      ║', color: '#6366f1', delay: 450 },
+    { text: '  ╚══════════════════════════════╝', color: '#6366f1', delay: 550 },
+    { text: '', delay: 700 },
+    { text: '✔ Select frontend:      Next.js', color: '#10b981', delay: 900 },
+    { text: '✔ Select backend:       Express', color: '#10b981', delay: 1150 },
+    { text: '✔ Select database:      PostgreSQL', color: '#10b981', delay: 1400 },
+    { text: '✔ Select auth:          JWT', color: '#10b981', delay: 1650 },
+    { text: '✔ Select UI system:     Tailwind + shadcn', color: '#10b981', delay: 1900 },
+    { text: '✔ Select deployment:    Docker', color: '#10b981', delay: 2150 },
+    { text: '', delay: 2400 },
+    { text: '  Generating project...', color: '#6b6b80', delay: 2600 },
+    { text: '', delay: 3000 },
+    { text: '✔ Module registry loaded      (32 modules)', color: '#10b981', delay: 3100 },
+    { text: '✔ Dependencies resolved       (6 selected)', color: '#10b981', delay: 3400 },
+    { text: '✔ Composition plan built', color: '#10b981', delay: 3700 },
+    { text: '✔ Files written               (47 files)', color: '#10b981', delay: 4000 },
+    { text: '✔ npm packages installed      (124ms)', color: '#10b981', delay: 4300 },
+    { text: '', delay: 4500 },
+    { text: '  ✨ Project ready! cd my-app && npm run dev', color: '#a5b4fc', delay: 4700 },
+    { text: '', delay: 4900 },
+    { text: '  ▸ Frontend  http://localhost:3000', color: '#6b6b80', delay: 5100 },
+    { text: '  ▸ Backend   http://localhost:3001', color: '#6b6b80', delay: 5200 },
+  ];
+
+  let animationTimers = [];
+  let animationStarted = false;
+
+  function startTerminalAnimation() {
+    animationTimers.forEach(t => clearTimeout(t));
+    animationTimers = [];
+    const body = document.getElementById('terminal-body');
+    body.innerHTML = '';
+
+    terminalLines.forEach((line, i) => {
+      const t = setTimeout(() => {
+        const div = document.createElement('div');
+        div.style.fontFamily = "'JetBrains Mono', monospace";
+        div.style.fontSize = '0.78rem';
+        div.style.lineHeight = '1.8';
+        div.style.color = line.color || 'var(--text)';
+        div.style.opacity = '0';
+        div.style.transform = 'translateX(-6px)';
+        div.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        div.style.minHeight = '1.4rem';
+        div.textContent = line.text;
+        body.appendChild(div);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            div.style.opacity = '1';
+            div.style.transform = 'translateX(0)';
+          });
+        });
+        body.scrollTop = body.scrollHeight;
+      }, line.delay);
+      animationTimers.push(t);
+    });
+  }
+
+  // Start terminal when it enters viewport
+  const terminalObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !animationStarted) {
+        animationStarted = true;
+        setTimeout(startTerminalAnimation, 400);
+        terminalObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  const terminalBox = document.getElementById('terminal-box');
+  if (terminalBox) terminalObserver.observe(terminalBox);
+
+  // ── Copy button flash ──
+  document.querySelectorAll('[onclick*="clipboard"]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const original = this.innerHTML;
+      this.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>';
+      setTimeout(() => { this.innerHTML = original; }, 1500);
+    });
+  });
+</script>
+
+</body>
+</html>
