@@ -13,7 +13,7 @@ import {
   LOCKFILE_NAME,
   CONFIG_NAME,
   FOUNDATION_CLI_VERSION,
-  StateWriteError,
+  // StateWriteError,
   type WriteStateOptions,
   type ProjectLockfile,
 } from "../state/index.js";
