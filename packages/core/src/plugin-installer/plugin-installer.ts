@@ -61,7 +61,7 @@ export class PluginInstallError extends FoundationError {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-export const HOOKS_FILENAME = "hooks.json" as const;
+export const HOOKS_FILENAME = "hooks.json";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -143,7 +143,7 @@ export async function installPlugin(
   // The plugin declares the minimum pluginApiVersion it requires.
   // We read the CLI's own version from its package.json and reject plugins
   // that require a newer API than this installation supports.
-  const pluginManifest = manifest as ModuleManifest & { pluginApiVersion?: string };
+  const pluginManifest = manifest as typeof manifest & { pluginApiVersion?: string };
   if (pluginManifest.pluginApiVersion) {
     let cliVersion = "1.0.0";
     try {
@@ -280,7 +280,7 @@ export async function loadInstalledPlugins(
     const hooksPath    = path.join(dir, HOOKS_FILENAME);
 
     try {
-      const rawManifest = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
+      const rawManifest: unknown = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
       ManifestValidator.assert(rawManifest);
 
       let packageName = path.basename(dir);
@@ -300,7 +300,7 @@ export async function loadInstalledPlugins(
       } catch { /* hooks.json is optional */ }
 
       plugins.push({
-        manifest: rawManifest as ModuleManifest,
+        manifest: rawManifest,
         packageName,
         sandboxedHooks,
       });
