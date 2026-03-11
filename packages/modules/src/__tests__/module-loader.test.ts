@@ -28,7 +28,6 @@ import {
   discoverByCategory,
   discoverRecursive,
   ManifestValidator,
-  type DiscoveryResult,
 } from "@foundation-cli/core";
 import {
   loadBuiltinModules,
@@ -565,7 +564,7 @@ describe("ModuleLoader", () => {
 
     const registry = new ModuleRegistry();
     const loader = new ModuleLoader(registry);
-    const result = await loader.loadFromDirectory(tmp); // category mode skips root files
+    // const result = await loader.loadFromDirectory(tmp); // category mode skips root files
     // Use flat mode to hit the bad file directly
     const result2 = await loader.loadFromDirectory(tmp, "flat");
     const summary = loader.formatSummary(result2);
