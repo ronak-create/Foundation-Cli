@@ -147,16 +147,16 @@ export async function runPromptGraph(
         answer = await promptFn.select({
           message: node.message,
           choices: resolvedChoices,
-          defaultValue: node.defaultValue,
+          ...(node.defaultValue !== undefined && { defaultValue: node.defaultValue }),
         });
         break;
       }
       case "text": {
         answer = await promptFn.text({
           message: node.message,
-          defaultValue: node.defaultValue,
-          validate: node.validate,
-          transformer: node.transformer,
+          ...(node.defaultValue !== undefined && { defaultValue: node.defaultValue }),
+          ...(node.validate && { validate: node.validate }),
+          ...(node.transformer && { transformer: node.transformer }),
         });
         break;
       }
