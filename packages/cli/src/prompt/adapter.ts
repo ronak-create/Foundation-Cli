@@ -26,22 +26,22 @@ export const inquirerAdapter: PromptAdapter = {
     const inquirerChoices = choices.map((c: PromptChoice) => ({
       name: formatChoiceName(c),
       value: c.value,
-      disabled: c.disabled,
+      ...(c.disabled !== undefined && { disabled: c.disabled }),
     }));
 
     return select<string>({
       message,
       choices: inquirerChoices,
-      default: defaultValue,
+      ...(defaultValue !== undefined && { default: defaultValue }),
     });
   },
 
   async text({ message, defaultValue, validate, transformer }): Promise<string> {
     return input({
       message,
-      default: defaultValue,
-      validate: validate as ((v: string) => string | boolean | Promise<string | boolean>) | undefined,
-      transformer: transformer as ((v: string, meta: { isFinal: boolean }) => string) | undefined,
+      ...(defaultValue !== undefined && { default: defaultValue }),
+      ...(validate && { validate }),
+      ...(transformer && { transformer }),
     });
   },
 
