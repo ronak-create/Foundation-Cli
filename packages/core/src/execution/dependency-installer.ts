@@ -187,11 +187,11 @@ export async function installPythonDependencies(
   const lines = existing.split("\n").filter((l) => l.trim() && !l.trim().startsWith("#"));
   const lineMap = new Map<string, string>();
   for (const line of lines) {
-    const name = line.split(/[><=!~\[;\s]/)[0]?.toLowerCase() ?? "";
+    const name = line.split(/[><=!~[;\s]/)[0]?.toLowerCase() ?? "";
     if (name) lineMap.set(name, line.trim());
   }
   for (const pkg of packages) {
-    const name = pkg.split(/[><=!~\[;\s]/)[0]?.toLowerCase() ?? "";
+    const name = pkg.split(/[><=!~[;\s]/)[0]?.toLowerCase() ?? "";
     if (name) lineMap.set(name, pkg);
   }
 
