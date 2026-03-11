@@ -127,15 +127,15 @@ export async function collectCredentials(
           // only the display while typing is masked.
           value = await adapter.text({
             message: promptLabel,
-            defaultValue: field.defaultValue,
-            validate: field.validate,
+            ...(field.defaultValue !== undefined && { defaultValue: field.defaultValue }),
+            ...(field.validate && { validate: field.validate }),
             transformer: (v: string) => (v.length > 0 ? "*".repeat(v.length) : ""),
           });
         } else {
           value = await adapter.text({
             message: field.label,
-            defaultValue: field.defaultValue,
-            validate: field.validate,
+            ...(field.defaultValue !== undefined && { defaultValue: field.defaultValue }),
+            ...(field.validate && { validate: field.validate }),
           });
         }
 
