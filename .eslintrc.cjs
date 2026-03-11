@@ -10,6 +10,14 @@ module.exports = {
     project: ["./tsconfig.json", "./packages/*/tsconfig.json"],
     tsconfigRootDir: __dirname,
   },
+    overrides: [
+    {
+      files: ["**/__tests__/**/*.ts", "**/*.test.ts"],
+      rules: {
+        "@typescript-eslint/require-await": "off",
+      },
+    },
+  ],
   plugins: ["@typescript-eslint"],
   extends: [
     "eslint:recommended",
