@@ -2,6 +2,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import path from "node:path";
+import type { JsonObject } from "../execution";
 import fs from "node:fs/promises";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
@@ -37,39 +38,38 @@ function makePlugin(
   overrides: Partial<PluginDefinition["manifest"]> = {},
   hooks: PluginDefinition["hooks"] = undefined,
 ): PluginDefinition {
-  return hooks
-    ? {
-        manifest: {
-          id,
-          name: `Module ${id}`,
-          version: "1.0.0",
-          description: "Test",
-          category: "tooling",
-          dependencies: [],
-          files: [],
-          configPatches: [],
-          compatibility: {},
-          ...overrides,
-        },
-        hooks,
-      }
-    : {
-        manifest: {
-          id,
-          name: `Module ${id}`,
-          version: "1.0.0",
-          description: "Test",
-          category: "tooling",
-          dependencies: [],
-          files: [],
-          configPatches: [],
-          compatibility: {},
-          ...overrides,
-        },
-      };
+  return hooks ? {
+    manifest: {
+      id,
+      name: `Module ${id}`,
+      version: "1.0.0",
+      description: "Test",
+      category: "tooling",
+      dependencies: [],
+      files: [],
+      configPatches: [],
+      compatibility: {},
+      ...overrides,
+    },
+    hooks,
+  }:
+  { manifest: {
+     id,
+      name: `Module ${id}`,
+      version: "1.0.0",
+      description: "Test",
+      category: "tooling",
+      dependencies: [],
+      files: [],
+      configPatches: [],
+      compatibility: {},
+      ...overrides,
+  } };
 }
 
-function buildMockPlan(overrides: Partial<CompositionPlan> = {}): CompositionPlan {
+function buildMockPlan(
+  overrides: Partial<CompositionPlan> = {},
+): CompositionPlan {
   return {
     files: [],
     dependencies: [],
@@ -84,12 +84,8 @@ function buildMockPlan(overrides: Partial<CompositionPlan> = {}): CompositionPla
 describe("executeCompositionPlan", () => {
   let tmp: string;
 
-  beforeEach(async () => {
-    tmp = await makeTmp();
-  });
-  afterEach(async () => {
-    await rmTmp(tmp);
-  });
+  beforeEach(async () => { tmp = await makeTmp(); });
+  afterEach(async () => { await rmTmp(tmp); });
 
   it("writes all files to disk", async () => {
     const { executeCompositionPlan } = await import("../execution/project-writer.js");
@@ -154,7 +150,7 @@ describe("config-merger", () => {
       include: ["tests"],
     };
 
-    const merged = mergeJsonContent(base, patch, "tsconfig.json");
+    const merged = mergeJsonContent(base, patch as JsonObject, "tsconfig.json");
     const parsed = JSON.parse(merged) as Record<string, unknown>;
     const opts = parsed["compilerOptions"] as Record<string, unknown>;
 
@@ -169,7 +165,7 @@ describe("config-merger", () => {
     const patch = { scripts: "not-an-object" };
 
     expect(() =>
-      mergeJsonContent(base, patch, "package.json"),
+      mergeJsonContent(base, patch as JsonObject, "package.json"),
     ).toThrowError(ConfigMergeError);
   });
 
@@ -180,7 +176,7 @@ describe("config-merger", () => {
     const patch = { dependencies: { react: "^18.0.0" } };
 
     expect(() =>
-      mergeJsonContent(base, patch, "package.json"),
+      mergeJsonContent(base, patch as JsonObject, "package.json"),
     ).toThrowError(ConfigMergeError);
   });
 
@@ -188,7 +184,7 @@ describe("config-merger", () => {
     const base = JSON.stringify({ include: ["src", "lib"] });
     const patch = { include: ["lib", "tests"] };
 
-    const merged = mergeJsonContent(base, patch, "tsconfig.json");
+    const merged = mergeJsonContent(base, patch as JsonObject, "tsconfig.json");
     const parsed = JSON.parse(merged) as { include: string[] };
     expect(parsed.include).toEqual(["src", "lib", "tests"]);
   });
@@ -199,7 +195,7 @@ describe("config-merger", () => {
       services: { app: { image: "node:20", ports: ["3000:3000"] } },
     };
 
-    const merged = mergeYamlContent(base, patch, "docker-compose.yml");
+    const merged = mergeYamlContent(base, patch as JsonObject, "docker-compose.yml");
     expect(merged).toContain("postgres");
     expect(merged).toContain("node:20");
   });
@@ -229,12 +225,8 @@ describe("config-merger", () => {
 describe("dependency-installer (dryRun)", () => {
   let tmp: string;
 
-  beforeEach(async () => {
-    tmp = await makeTmp();
-  });
-  afterEach(async () => {
-    await rmTmp(tmp);
-  });
+  beforeEach(async () => { tmp = await makeTmp(); });
+  afterEach(async () => { await rmTmp(tmp); });
 
   it("writes deps to package.json and returns install result (dry run)", async () => {
     const { installDependencies } = await import("../execution/dependency-installer.js");
@@ -249,9 +241,7 @@ describe("dependency-installer (dryRun)", () => {
       targetDir: tmp,
       deps,
       dryRun: true,
-      onProgress: (p) => {
-        events.push(p.message);
-      },
+      onProgress: (p) => { events.push(p.message); },
     });
 
     expect(result.installed).toHaveLength(2);
@@ -303,12 +293,8 @@ describe("hook-runner", () => {
         "base",
         { compatibility: {} },
         {
-          beforeWrite: async () => {
-            order.push("base:beforeWrite");
-          },
-          afterInstall: async () => {
-            order.push("base:afterInstall");
-          },
+          beforeWrite: async () => { order.push("base:beforeWrite"); },
+          afterInstall: async () => { order.push("base:afterInstall"); },
         },
       ),
     );
@@ -317,12 +303,8 @@ describe("hook-runner", () => {
         "auth",
         { compatibility: { requires: ["base"] } },
         {
-          beforeWrite: async () => {
-            order.push("auth:beforeWrite");
-          },
-          afterInstall: async () => {
-            order.push("auth:afterInstall");
-          },
+          beforeWrite: async () => { order.push("auth:beforeWrite"); },
+          afterInstall: async () => { order.push("auth:afterInstall"); },
         },
       ),
     );
@@ -341,7 +323,9 @@ describe("hook-runner", () => {
     await runHooksForPlan("beforeWrite", plan, registry, ctx, { strict: true });
 
     // base must appear before auth in topological order
-    expect(order.indexOf("base:beforeWrite")).toBeLessThan(order.indexOf("auth:beforeWrite"));
+    expect(order.indexOf("base:beforeWrite")).toBeLessThan(
+      order.indexOf("auth:beforeWrite"),
+    );
   });
 
   it("skips hooks that are not defined on a plugin", async () => {
@@ -372,12 +356,7 @@ describe("hook-runner", () => {
       plan,
       registry,
       { projectRoot: "/tmp", config: {}, selectedModules: [] },
-      {
-        strict: true,
-        onHookSkipped: (id, hook) => {
-          skipped.push(`${id}:${hook}`);
-        },
-      },
+      { strict: true, onHookSkipped: (id, hook) => { skipped.push(`${id}:${hook}`); } },
     );
 
     expect(skipped).toContain("no-hooks:beforeWrite");
@@ -386,15 +365,9 @@ describe("hook-runner", () => {
   it("throws HookExecutionError in strict mode when a hook fails", async () => {
     const registry = new ModuleRegistry();
     registry.registerModule(
-      makePlugin(
-        "failing-module",
-        {},
-        {
-          beforeWrite: async () => {
-            throw new Error("hook exploded");
-          },
-        },
-      ),
+      makePlugin("failing-module", {}, {
+        beforeWrite: async () => { throw new Error("hook exploded"); },
+      }),
     );
 
     const plan = buildMockPlan({
@@ -429,15 +402,9 @@ describe("hook-runner", () => {
   it("swallows hook errors in non-strict mode", async () => {
     const registry = new ModuleRegistry();
     registry.registerModule(
-      makePlugin(
-        "fragile",
-        {},
-        {
-          afterInstall: async () => {
-            throw new Error("non-fatal");
-          },
-        },
-      ),
+      makePlugin("fragile", {}, {
+        afterInstall: async () => { throw new Error("non-fatal"); },
+      }),
     );
 
     const plan = buildMockPlan({
@@ -475,12 +442,8 @@ describe("hook-runner", () => {
 describe("runExecutionPipeline — full integration", () => {
   let tmp: string;
 
-  beforeEach(async () => {
-    tmp = await makeTmp();
-  });
-  afterEach(async () => {
-    await rmTmp(tmp);
-  });
+  beforeEach(async () => { tmp = await makeTmp(); });
+  afterEach(async () => { await rmTmp(tmp); });
 
   it("runs full pipeline: writes files, applies patches, installs (dry), runs hooks in order", async () => {
     const hookOrder: string[] = [];
@@ -491,8 +454,12 @@ describe("runExecutionPipeline — full integration", () => {
       makePlugin(
         "mod-base",
         {
-          files: [{ relativePath: "src/index.ts", content: "// base" }],
-          dependencies: [{ name: "express", version: "^4.18.0", scope: "dependencies" }],
+          files: [
+            { relativePath: "src/index.ts", content: "// base" },
+          ],
+          dependencies: [
+            { name: "express", version: "^4.18.0", scope: "dependencies" },
+          ],
           configPatches: [
             {
               targetFile: "package.json",
@@ -501,15 +468,9 @@ describe("runExecutionPipeline — full integration", () => {
           ],
         },
         {
-          beforeWrite: async () => {
-            hookOrder.push("mod-base:beforeWrite");
-          },
-          afterInstall: async () => {
-            hookOrder.push("mod-base:afterInstall");
-          },
-          afterWrite: async () => {
-            hookOrder.push("mod-base:afterWrite");
-          },
+          beforeWrite: async () => { hookOrder.push("mod-base:beforeWrite"); },
+          afterInstall: async () => { hookOrder.push("mod-base:afterInstall"); },
+          afterWrite: async () => { hookOrder.push("mod-base:afterWrite"); },
         },
       ),
     );
@@ -519,16 +480,14 @@ describe("runExecutionPipeline — full integration", () => {
         "mod-auth",
         {
           files: [{ relativePath: "src/auth.ts", content: "// auth" }],
-          dependencies: [{ name: "jsonwebtoken", version: "^9.0.0", scope: "dependencies" }],
+          dependencies: [
+            { name: "jsonwebtoken", version: "^9.0.0", scope: "dependencies" },
+          ],
           compatibility: { requires: ["mod-base"] },
         },
         {
-          beforeWrite: async () => {
-            hookOrder.push("mod-auth:beforeWrite");
-          },
-          afterInstall: async () => {
-            hookOrder.push("mod-auth:afterInstall");
-          },
+          beforeWrite: async () => { hookOrder.push("mod-auth:beforeWrite"); },
+          afterInstall: async () => { hookOrder.push("mod-auth:afterInstall"); },
         },
       ),
     );
@@ -547,14 +506,18 @@ describe("runExecutionPipeline — full integration", () => {
         config: { projectName: "test-project" },
         selectedModules: ["mod-auth"],
       },
-      onProgress: (e) => {
-        events.push(`[${e.stage}] ${e.message}`);
-      },
+      onProgress: (e) => { events.push(`[${e.stage}] ${e.message}`); },
     });
 
     // ── Files written
-    const indexContent = await fs.readFile(path.join(tmp, "src/index.ts"), "utf-8");
-    const authContent = await fs.readFile(path.join(tmp, "src/auth.ts"), "utf-8");
+    const indexContent = await fs.readFile(
+      path.join(tmp, "src/index.ts"),
+      "utf-8",
+    );
+    const authContent = await fs.readFile(
+      path.join(tmp, "src/auth.ts"),
+      "utf-8",
+    );
     expect(indexContent).toBe("// base");
     expect(authContent).toBe("// auth");
 
