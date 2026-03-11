@@ -66,10 +66,10 @@ const validPort = (v: string): string | true => {
     : "Port must be a number between 1 and 65535";
 };
 
-const minLength =
-  (min: number, label: string) =>
-  (v: string): string | true =>
-    v.trim().length >= min ? true : `${label} must be at least ${min} characters`;
+// const minLength =
+//   (min: number, label: string) =>
+//   (v: string): string | true =>
+//     v.trim().length >= min ? true : `${label} must be at least ${min} characters`;
 
 const startsWith =
   (prefix: string, label: string) =>
