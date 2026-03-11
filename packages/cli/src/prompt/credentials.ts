@@ -387,9 +387,11 @@ export const CREDENTIAL_MAP: Readonly<Record<string, CredentialGroup>> = {
 export function getCredentialGroup(
   selectionValue: string,
 ): CredentialGroup | undefined {
-  return CREDENTIAL_MAP[selectionValue as keyof typeof CREDENTIAL_MAP];
+  if (selectionValue in CREDENTIAL_MAP) {
+    return CREDENTIAL_MAP[selectionValue as keyof typeof CREDENTIAL_MAP];
+  }
+  return undefined;
 }
-
 /**
  * Given all raw selections from the prompt flow, returns the ordered list of
  * [selectionValue, CredentialGroup] pairs that need credentials collected.
