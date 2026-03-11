@@ -201,7 +201,9 @@ export async function runPromptFlow(
   // - deprecated:   always warn with successor info
   // - removed:      hard error with migration guide URL
   if (registry) {
-    const { SELECTION_TO_MODULE_ID } = await import("@foundation-cli/modules");
+    const { SELECTION_TO_MODULE_ID } = (await import("@foundation-cli/modules")) as {
+      SELECTION_TO_MODULE_ID: Record<string, string>;
+    };
     for (const selectionValue of Object.values(rawSelections)) {
       if (!selectionValue || selectionValue === "none") continue;
       const moduleId = SELECTION_TO_MODULE_ID[selectionValue] ?? selectionValue;
