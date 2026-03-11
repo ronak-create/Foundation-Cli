@@ -43,7 +43,7 @@ function deepMergeObjects(
   keyPath = "",
 ): JsonObject {
   return mergeWith(
-    structuredClone(target) as JsonObject,
+    structuredClone(target),
     source,
     (objVal: JsonValue, srcVal: JsonValue, key: string): JsonValue | undefined => {
       const currentPath = keyPath !== "" ? `${keyPath}.${key}` : key;
