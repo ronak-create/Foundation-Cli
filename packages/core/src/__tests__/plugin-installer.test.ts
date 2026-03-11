@@ -10,7 +10,7 @@ import {
   resolvePackageName,
   PluginAlreadyInstalledError,
   PluginManifestMissingError,
-  NotAFoundationProjectError,
+  // NotAFoundationProjectError,
 } from "../plugin-installer/index.js";
 import { ValidationError } from "../errors.js";
 import {
@@ -18,9 +18,9 @@ import {
   readProjectState,
   FOUNDATION_DIR,
   LOCKFILE_NAME,
-  CONFIG_NAME,
+  // CONFIG_NAME,
 } from "../state/project-state.js";
-import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+// import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
