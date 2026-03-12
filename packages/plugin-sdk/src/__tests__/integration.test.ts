@@ -44,7 +44,7 @@ describe("Plugin SDK integration (AJV)", () => {
 
   it("invalid dependency scope fails", () => {
     const manifest = makeManifest("bad-scope");
-    (manifest.dependencies[0] as any).scope = "invalid";
+    (manifest.dependencies[0] as unknown as Record<string, unknown>)["scope"] = "invalid";
 
     const result = validateModuleManifest(manifest);
     expect(result.valid).toBe(false);
@@ -52,7 +52,7 @@ describe("Plugin SDK integration (AJV)", () => {
 
   it("invalid file entry fails", () => {
     const manifest = makeManifest("bad-file");
-    (manifest.files[0] as any).relativePath = "";
+    (manifest.files[0] as unknown as Record<string, unknown>)["relativePath"] = "";
 
     const result = validateModuleManifest(manifest);
     expect(result.valid).toBe(false);
@@ -60,7 +60,7 @@ describe("Plugin SDK integration (AJV)", () => {
 
   it("invalid config patch fails", () => {
     const manifest = makeManifest("bad-patch");
-    (manifest.configPatches[0] as any).merge = "not-object";
+    (manifest.configPatches[0] as unknown as Record<string, unknown>)["merge"] = "not-object";
 
     const result = validateModuleManifest(manifest);
     expect(result.valid).toBe(false);

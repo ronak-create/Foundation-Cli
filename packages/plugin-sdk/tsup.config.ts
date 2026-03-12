@@ -10,4 +10,5 @@ export default defineConfig({
   clean: true,
   splitting: false,
   treeshake: true,
+  tsconfig: "./tsconfig.json",
 });

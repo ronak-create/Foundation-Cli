@@ -123,13 +123,10 @@ export const dockerModule: PluginDefinition = {
     },
   },
   hooks: {
-    afterWrite: async (ctx: PluginHookContext): Promise<void> => {
+    afterWrite: (_ctx: PluginHookContext): Promise<void> => {
       // Validate docker-compose references DB env var when postgresql is present.
-      const hasPostgres = ctx.selectedModules.includes("database-postgresql");
-      if (!hasPostgres) {
-        // Remove db service references silently — docker compose will still
-        // work, just without a DB service.
-      }
+      // No async operations needed; hook is synchronous.
+      return Promise.resolve();
     },
   },
 };

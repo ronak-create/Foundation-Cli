@@ -23,16 +23,16 @@ export const inquirerAdapter: PromptAdapter = {
   async select({ message, choices, defaultValue }): Promise<string> {
     const inquirerChoices = choices.map((c: PromptChoice) => ({
       name: formatChoiceName(c),
-      value: c.value as string, // Assert string (matches RawSelections)
+      value: c.value, // matches RawSelections string type
       ...(c.disabled !== undefined && { disabled: c.disabled }),
     }));
 
     // Type the result explicitly
-    const result = (await select({
+    const result = await select({
       message,
       choices: inquirerChoices,
       ...(defaultValue !== undefined && { default: defaultValue }),
-    })) as string; // Assertion resolves 'any' from inquirer internals
+    });
 
     return result;
   },

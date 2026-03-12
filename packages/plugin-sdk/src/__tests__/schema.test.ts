@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { validateModuleManifest } from "../validate.js";
-import type { ModuleManifest } from "../types.js";
+import type { ModuleManifest, PluginCategory } from "../types.js";
 
 describe("ModuleManifest schema (AJV)", () => {
   const validManifest: ModuleManifest = {
@@ -21,8 +21,8 @@ describe("ModuleManifest schema (AJV)", () => {
   });
 
   it("rejects missing required fields", () => {
-    const invalid = { ...validManifest } as any;
-    delete invalid.id;
+    const invalid = { ...validManifest } as unknown as Record<string, unknown>;
+    delete invalid["id"];
 
     const result = validateModuleManifest(invalid);
     expect(result.valid).toBe(false);
@@ -35,7 +35,7 @@ describe("ModuleManifest schema (AJV)", () => {
   });
 
   it("rejects invalid category", () => {
-    const invalid = { ...validManifest, category: "unknown" as any };
+    const invalid = { ...validManifest, category: "unknown" as unknown as PluginCategory };
     const result = validateModuleManifest(invalid);
     expect(result.valid).toBe(false);
   });

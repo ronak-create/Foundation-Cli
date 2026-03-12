@@ -2,7 +2,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import path from "node:path";
-import type { JsonObject } from "../execution/config-merger.js";
+// import type { JsonObject } from "../execution/config-merger.js";
 import fs from "node:fs/promises";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
@@ -150,7 +150,7 @@ describe("config-merger", () => {
       include: ["tests"],
     };
 
-    const merged = mergeJsonContent(base, patch as JsonObject, "tsconfig.json");
+    const merged = mergeJsonContent(base, patch, "tsconfig.json");
     const parsed = JSON.parse(merged) as Record<string, unknown>;
     const opts = parsed["compilerOptions"] as Record<string, unknown>;
 
@@ -165,7 +165,7 @@ describe("config-merger", () => {
     const patch = { scripts: "not-an-object" };
 
     expect(() =>
-      mergeJsonContent(base, patch as JsonObject, "package.json"),
+      mergeJsonContent(base, patch, "package.json"),
     ).toThrowError(ConfigMergeError);
   });
 
@@ -176,7 +176,7 @@ describe("config-merger", () => {
     const patch = { dependencies: { react: "^18.0.0" } };
 
     expect(() =>
-      mergeJsonContent(base, patch as JsonObject, "package.json"),
+      mergeJsonContent(base, patch, "package.json"),
     ).toThrowError(ConfigMergeError);
   });
 
@@ -184,7 +184,7 @@ describe("config-merger", () => {
     const base = JSON.stringify({ include: ["src", "lib"] });
     const patch = { include: ["lib", "tests"] };
 
-    const merged = mergeJsonContent(base, patch as JsonObject, "tsconfig.json");
+    const merged = mergeJsonContent(base, patch, "tsconfig.json");
     const parsed = JSON.parse(merged) as { include: string[] };
     expect(parsed.include).toEqual(["src", "lib", "tests"]);
   });
@@ -195,7 +195,7 @@ describe("config-merger", () => {
       services: { app: { image: "node:20", ports: ["3000:3000"] } },
     };
 
-    const merged = mergeYamlContent(base, patch as JsonObject, "docker-compose.yml");
+    const merged = mergeYamlContent(base, patch, "docker-compose.yml");
     expect(merged).toContain("postgres");
     expect(merged).toContain("node:20");
   });

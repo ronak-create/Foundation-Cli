@@ -116,15 +116,15 @@ export function resolveModules(
     const matrix = manifest.compatibility.compatibleWith;
     if (matrix == null) continue;
 
-    for (const [category, allowed] of Object.entries(matrix)) {
+    for (const [category, allowedList] of Object.entries(matrix)) {
       const peers = Array.from(resolved.values()).filter(
         (m) => m.category === category && m.id !== manifest.id,
       );
       for (const peer of peers) {
-        if (!allowed.includes("*") && !allowed.includes(peer.id)) {
+        if (!allowedList.includes("*") && !allowedList.includes(peer.id)) {
           warnings.push(
             `"${manifest.id}" has not been tested with "${peer.id}" ` +
-              `(${category}). Tested: ${allowed.join(", ")}`,
+              `(${category}). Tested: ${allowedList.join(", ")}`,
           );
         }
       }

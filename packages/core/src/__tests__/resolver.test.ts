@@ -25,8 +25,8 @@ function makePlugin(
       files: [],
       configPatches: [],
       compatibility: {
-        requires: requires.length > 0 ? requires : undefined,
-        conflicts: conflicts.length > 0 ? conflicts : undefined,
+        ...(requires.length > 0 ? { requires } : {}),
+        ...(conflicts.length > 0 ? { conflicts } : {}),
       },
     },
   };

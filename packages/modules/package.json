@@ -9,6 +9,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./registry-loader": {
+      "import": "./dist/registry-loader.js",
+      "types": "./dist/registry-loader.d.ts"
     }
   },
   "files": ["dist"],

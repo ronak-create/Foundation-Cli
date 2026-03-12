@@ -532,7 +532,7 @@ describe("ModuleRegistry uses ManifestValidator", () => {
 
     expect(() =>
       registry.registerModule({
-        manifest: validManifest()  as ModuleManifest,
+        manifest: validManifest() as unknown as ModuleManifest,
       }),
     ).not.toThrow();
   });
@@ -576,7 +576,13 @@ describe("ModuleRegistry uses ManifestValidator", () => {
   });
 
   it("existing built-in modules all pass ManifestValidator", async () => {
-    const { loadBuiltinModules } = await import("../../../modules/src/registry-loader.js").catch(
+    // Use a computed import path so TypeScript does not statically resolve this
+    // cross-package reference (which would violate rootDir). At runtime the
+    // path resolves correctly; if the modules package hasn't been built the
+    // catch branch skips the test gracefully.
+    const modulesPath = "../../../modules/src/registry-loader.js";
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const { loadBuiltinModules } = await import(/* @vite-ignore */ modulesPath).catch(
       () => ({ loadBuiltinModules: null }),
     );
 
@@ -588,7 +594,7 @@ describe("ModuleRegistry uses ManifestValidator", () => {
     const { ModuleRegistry } = await import("../index.js");
     const registry = new ModuleRegistry();
 
-    expect(() => (loadBuiltinModules as (r: typeof registry) => void)(registry)).not.toThrow();
+    expect(() => (loadBuiltinModules as unknown as (r: typeof registry) => void)(registry)).not.toThrow();
   });
 });
 

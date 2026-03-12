@@ -32,7 +32,7 @@ export class ConfigMergeError extends FoundationError {
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
-type JsonObject = Record<string, JsonValue>;
+export type JsonObject = Record<string, JsonValue>;
 
 // ── Deep merge (JSON / YAML objects) ─────────────────────────────────────────
 

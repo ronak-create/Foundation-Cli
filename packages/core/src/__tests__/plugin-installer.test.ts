@@ -658,7 +658,7 @@ describe("loadInstalledPlugins", () => {
     const plugins = await loadInstalledPlugins(tmp);
     // loadInstalledPlugins returns { manifest, packageName } — no hooks property
     for (const plugin of plugins) {
-      expect((plugin as Record<string, unknown>)["hooks"]).toBeUndefined();
+      expect((plugin as unknown as Record<string, unknown>)["hooks"]).toBeUndefined();
     }
   });
 });

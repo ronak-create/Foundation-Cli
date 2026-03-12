@@ -9,7 +9,7 @@ export default defineConfig({
   clean: true,
   splitting: false,
   treeshake: true,
-  external: [],
+  external: ["ejs", "execa", "ajv", "ajv-formats", "js-yaml", "lodash-es"],
   // 🚨 IMPORTANT
   ignoreWatch: ["**/__tests__/**", "**/*.test.ts"],
 });
