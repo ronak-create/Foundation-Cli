@@ -3,7 +3,7 @@
 > **A modular project composition engine. Not a template copier.**
 
 ```bash
-npx create-foundation-app
+npx @systemlabs/foundation-cli create .
 ```
 
 A senior developer should be able to go from zero to a running, linted, type-checked, database-connected app with auth in under 3 minutes — no manual config editing, no missing dependencies, no broken imports.
