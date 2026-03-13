@@ -26,10 +26,10 @@ Foundation CLI is a **dependency-aware project assembler**. You describe your in
 
 ```bash
 # One-shot bootstrap (no prior install needed)
-npx create-foundation-app
+npx @systemlabs/foundation-cli
 
 # Or install globally for repeated use
-npm install -g @foundation-cli/cli
+npm install -g @systemlabs/foundation-cli
 foundation create my-app
 ```
 
