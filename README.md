@@ -1,6 +1,6 @@
 # Foundation CLI
 
-> **A modular project composition engine. Not a template copier.**
+> **A modular project composition engine.**
 
 ```bash
 npx @systemlabs/foundation-cli create .
