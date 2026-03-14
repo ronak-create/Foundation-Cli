@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const NEXT_APP_LAYOUT = `import type { Metadata } from "next";
 import "./globals.css";
@@ -171,3 +171,4 @@ export const nextjsModule: PluginDefinition = {
     },
   },
 };
+

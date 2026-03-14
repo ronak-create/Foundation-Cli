@@ -12,7 +12,7 @@
 
 import { select } from "@inquirer/prompts";
 import chalk from "chalk";
-import type { DependencyConflict } from "@foundation-cli/core";
+import type { DependencyConflict } from "@systemlabs/foundation-core";
 
 export async function resolveConflictsInteractively(
   conflicts: ReadonlyArray<DependencyConflict>,

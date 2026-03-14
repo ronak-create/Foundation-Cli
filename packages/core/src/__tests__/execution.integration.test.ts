@@ -18,7 +18,7 @@ import {
   mergeYamlContent,
   mergeEnvContent,
 } from "../index.js";
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 import type { CompositionPlan } from "../types.js";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -583,3 +583,4 @@ describe("runExecutionPipeline — full integration", () => {
     expect(result.duration).toBeGreaterThanOrEqual(0);
   });
 });
+

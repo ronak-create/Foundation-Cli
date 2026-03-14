@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import ora from "ora";
-import { searchPlugins, RegistrySearchError } from "@foundation-cli/core";
-import type { PluginSearchResult } from "@foundation-cli/core";
+import { searchPlugins, RegistrySearchError } from "@systemlabs/foundation-core";
+import type { PluginSearchResult } from "@systemlabs/foundation-core";
 import { printError } from "../ui/renderer.js";
 
 // ── Layout constants ──────────────────────────────────────────────────────────

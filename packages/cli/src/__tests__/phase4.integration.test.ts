@@ -9,7 +9,7 @@ import {
   buildCompositionPlan,
   runExecutionPipeline,
   ModuleConflictError,
-} from "@foundation-cli/core";
+} from "@systemlabs/foundation-core";
 import {
   loadBuiltinModules,
   selectionsToModuleIds,
@@ -20,7 +20,7 @@ import {
   dockerModule,
   tailwindModule,
   nextjsModule,
-} from "@foundation-cli/modules";
+} from "@systemlabs/foundation-modules";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

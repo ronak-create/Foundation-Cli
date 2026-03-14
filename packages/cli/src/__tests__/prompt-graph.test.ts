@@ -617,7 +617,7 @@ describe("full graph run → module IDs", () => {
    * Simulates what create.ts does:
    *   runPromptGraph → SelectionMap → selectionsToModuleIds
    *
-   * We test this without importing @foundation-cli/modules to keep the test
+   * We test this without importing @systemlabs/foundation-modules to keep the test
    * isolated to the CLI layer. A full E2E test in phase4.integration.test.ts
    * covers the registry path.
    */
@@ -837,3 +837,4 @@ describe("PromptAdapter interface contract", () => {
     expect(validateFn).not.toHaveBeenCalled(); // adapter calls it, not the runner
   });
 });
+

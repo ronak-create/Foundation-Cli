@@ -3,7 +3,7 @@
  *
  * This is the authoritative ordered list of PromptNodes that drives the
  * interactive CLI session. Every choice value maps 1-to-1 with the keys in
- * SELECTION_TO_MODULE_ID from @foundation-cli/modules.
+ * SELECTION_TO_MODULE_ID from @systemlabs/foundation-modules.
  *
  * Node ordering matters: nodes earlier in the array can influence `when`
  * predicates and `onAnswer` hooks of later nodes. The DAG structure is:

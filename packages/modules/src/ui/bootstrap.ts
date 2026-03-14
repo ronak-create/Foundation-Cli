@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const BOOTSTRAP_LAYOUT_TSX = `import "bootstrap/dist/css/bootstrap.min.css";
 import type { ReactNode } from "react";

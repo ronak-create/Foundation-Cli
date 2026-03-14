@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const DB_CLIENT_TS = `import { Pool } from "pg";
 import { config } from "dotenv";
@@ -84,3 +84,4 @@ export const postgresqlModule: PluginDefinition = {
     },
   },
 };
+

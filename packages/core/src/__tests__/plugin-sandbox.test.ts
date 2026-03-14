@@ -10,7 +10,7 @@ import {
 import { runHooksForPlan } from "../execution/hook-runner.js";
 import { HookExecutionError } from "../execution/hook-runner.js";
 import { ModuleRegistry } from "../module-registry/registry.js";
-import type { PluginHookContext, ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { PluginHookContext, ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 import type { CompositionPlan } from "../types.js";
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────

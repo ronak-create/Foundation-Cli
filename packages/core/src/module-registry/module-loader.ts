@@ -40,7 +40,7 @@ import fs from "node:fs/promises";
 import type { Dirent } from "node:fs";
 import path from "node:path";
 // import { pathToFileURL } from "node:url";
-import type { PluginDefinition, PluginFactory } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition, PluginFactory } from "@systemlabs/foundation-plugin-sdk";
 import { ManifestValidator } from "../manifest-validator/validator.js";
 import type { ModuleRegistry } from "./registry.js";
 import type { SandboxedHooks } from "../plugin-installer/plugin-installer.js";
@@ -497,3 +497,4 @@ export class ModuleLoader {
     this.#log(this.formatSummary(result));
   }
 }
+

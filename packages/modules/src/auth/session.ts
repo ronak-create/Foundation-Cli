@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const SESSION_CONFIG_TS = `import session from "express-session";
 import { config } from "dotenv";

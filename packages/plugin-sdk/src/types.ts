@@ -11,7 +11,8 @@ export type PluginCategory =
   | "testing"
   | "state"
   | "tooling"
-  | "addon";
+  | "addon"
+  | "generate";
 
 // ── Runtime ───────────────────────────────────────────────────────────────────
 
@@ -112,6 +113,17 @@ export interface PluginHooks {
   readonly onFinalize?: (ctx: PluginHookContext) => Promise<void>;
   /** On any failure. Clean up side-effects (e.g. remove created API keys). */
   readonly onRollback?: (ctx: PluginHookContext) => Promise<void>;
+  /**
+   * Called before a generator writes its files.
+   * Modules can inspect or modify the generator context by mutating
+   * ctx.config — the generate command threads the GeneratorContext through
+   * ctx.config.__generatorContext for hook access.
+   */
+  readonly onGenerate?: (ctx: PluginHookContext) => Promise<void>;
+  /** Called when `foundation dev` is invoked. Modules run dev-time setup. */
+  readonly onStart?: (ctx: PluginHookContext) => Promise<void>;
+  /** Called when `foundation build` is invoked. Modules run their build steps. */
+  readonly onBuild?: (ctx: PluginHookContext) => Promise<void>;
 }
 
 // ── Compatibility ─────────────────────────────────────────────────────────────

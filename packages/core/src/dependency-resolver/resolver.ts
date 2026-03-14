@@ -8,7 +8,7 @@
 //   - Module lifecycle status enforcement (spec §11.3)
 //   - peerFrameworks range check (spec §4.4)
 
-import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 import type { ModuleRegistry } from "../module-registry/registry.js";
 import type { ResolutionResult } from "../types.js";
 import {

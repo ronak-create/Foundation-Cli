@@ -4,17 +4,17 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
 
-import { ManifestValidator } from "@foundation-cli/core";
-import { ModuleRegistry, resolveModules, buildCompositionPlan } from "@foundation-cli/core";
+import { ManifestValidator } from "@systemlabs/foundation-core";
+import { ModuleRegistry, resolveModules, buildCompositionPlan } from "@systemlabs/foundation-core";
 import {
   writeProjectState,
   readProjectState,
   FOUNDATION_DIR,
-} from "@foundation-cli/core";
+} from "@systemlabs/foundation-core";
 import {
   installPlugin,
   loadPluginsFromProject,
-} from "@foundation-cli/core";
+} from "@systemlabs/foundation-core";
 
 import {
   stripePlugin,
@@ -296,7 +296,7 @@ describe("addon plugins — hook sources", () => {
   });
 
   it("stripe hook source evaluates to a function in a safe context", async () => {
-    const { executeSandboxedHook } = await import("@foundation-cli/core");
+    const { executeSandboxedHook } = await import("@systemlabs/foundation-core");
     const ctx = {
       projectRoot: "/tmp",
       config: {},
@@ -308,7 +308,7 @@ describe("addon plugins — hook sources", () => {
   });
 
   it("redis hook source executes without error in sandbox", async () => {
-    const { executeSandboxedHook } = await import("@foundation-cli/core");
+    const { executeSandboxedHook } = await import("@systemlabs/foundation-core");
     const ctx = {
       projectRoot: "/tmp",
       config: {},
@@ -320,7 +320,7 @@ describe("addon plugins — hook sources", () => {
   });
 
   it("openai hook source executes without error in sandbox", async () => {
-    const { executeSandboxedHook } = await import("@foundation-cli/core");
+    const { executeSandboxedHook } = await import("@systemlabs/foundation-core");
     const ctx = {
       projectRoot: "/tmp",
       config: {},
@@ -791,3 +791,4 @@ describe("all three addon plugins installed together", () => {
     expect(byId["plugin-openai"]?.version).toBe("1.0.0");
   });
 });
+

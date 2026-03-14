@@ -17,11 +17,11 @@ import path from "node:path";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
 
-import { ModuleRegistry, ManifestValidator } from "@foundation-cli/core";
+import { ModuleRegistry, ManifestValidator } from "@systemlabs/foundation-core";
 import {
   loadInstalledPlugins,
   registerInstalledPlugins,
-} from "@foundation-cli/core";
+} from "@systemlabs/foundation-core";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

@@ -8,8 +8,8 @@ import {
   buildCompositionPlan,
   resolveModules,
   FileTransaction,
-} from "@foundation-cli/core";
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+} from "@systemlabs/foundation-core";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -177,7 +177,7 @@ describe("Generation pipeline — integration", () => {
   // ── Config merging ──────────────────────────────────────────────────────────
 
   it("JSON merge: deep merges two config objects correctly", async () => {
-    const { mergeJson } = await import("@foundation-cli/core");
+    const { mergeJson } = await import("@systemlabs/foundation-core");
 
     const base = JSON.stringify({
       compilerOptions: { strict: true, target: "ES2020" },
@@ -201,7 +201,7 @@ describe("Generation pipeline — integration", () => {
   });
 
   it("JSON merge: throws on incompatible field types", async () => {
-    const { mergeJson, MergeConflictError } = await import("@foundation-cli/core");
+    const { mergeJson, MergeConflictError } = await import("@systemlabs/foundation-core");
     const base = JSON.stringify({ scripts: { dev: "vite" } });
     const patch = JSON.stringify({ scripts: "not-an-object" });
 
@@ -209,7 +209,7 @@ describe("Generation pipeline — integration", () => {
   });
 
   it(".env merge: overwrites existing keys and appends new keys", async () => {
-    const { mergeEnv } = await import("@foundation-cli/core");
+    const { mergeEnv } = await import("@systemlabs/foundation-core");
 
     const base = "PORT=3000\nDATABASE_URL=postgres://localhost/dev\n";
     const patch = "PORT=4000\nJWT_SECRET=supersecret";
@@ -223,7 +223,7 @@ describe("Generation pipeline — integration", () => {
   // ── Template rendering ──────────────────────────────────────────────────────
 
   it("renders EJS templates with provided variables", async () => {
-    const { renderTemplate } = await import("@foundation-cli/core");
+    const { renderTemplate } = await import("@systemlabs/foundation-core");
 
     const template = `const PROJECT = "<%= projectName %>";\nconst DB = "<%= database %>";`;
     const result = renderTemplate(template, {
@@ -235,7 +235,7 @@ describe("Generation pipeline — integration", () => {
   });
 
   it("passes through non-template content unchanged", async () => {
-    const { renderTemplate } = await import("@foundation-cli/core");
+    const { renderTemplate } = await import("@systemlabs/foundation-core");
 
     const plain = "# Plain markdown with no EJS tags";
     const result = renderTemplate(plain, { anything: "value" });
@@ -244,7 +244,7 @@ describe("Generation pipeline — integration", () => {
 
   it("throws TemplateRenderError for malformed EJS", async () => {
     const { renderTemplate, TemplateRenderError } = await import(
-      "@foundation-cli/core"
+      "@systemlabs/foundation-core"
     );
 
     const broken = "<% if (true %>";

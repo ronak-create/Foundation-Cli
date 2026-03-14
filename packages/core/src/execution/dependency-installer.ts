@@ -2,7 +2,7 @@ import { execa } from "execa";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { FoundationError } from "../errors.js";
-import type { PackageDependency } from "@foundation-cli/plugin-sdk";
+import type { PackageDependency } from "@systemlabs/foundation-plugin-sdk";
 
 // ── Error ─────────────────────────────────────────────────────────────────────
 
@@ -302,3 +302,4 @@ export async function installDependencies(
     duration,
   };
 }
+

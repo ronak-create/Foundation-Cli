@@ -18,7 +18,7 @@ import {
   cleanupFetchTemp,
   type FetchedPlugin,
 } from "./npm-fetcher.js";
-import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 import type { HookName } from "../execution/hook-runner.js";
 import type { ModuleRegistry } from "../module-registry/registry.js";
 
@@ -149,7 +149,7 @@ export async function installPlugin(
     try {
       const { createRequire } = await import("node:module");
       const require = createRequire(import.meta.url);
-      // Walk up to find @foundation-cli/core's package.json
+      // Walk up to find @systemlabs/foundation-core's package.json
       const corePkg = require("../../../package.json") as { version?: string };
       cliVersion = corePkg.version ?? "1.0.0";
     } catch { /* best-effort */ }
@@ -163,7 +163,7 @@ export async function installPlugin(
         pluginManifest.id ?? pluginName,
         new Error(
           `Plugin requires pluginApiVersion ${pluginManifest.pluginApiVersion} but this CLI is v${cliVersion}. ` +
-          `Run \`npm install -g @foundation-cli/cli@latest\` to upgrade.`,
+          `Run \`npm install -g @systemlabs/foundation-cli@latest\` to upgrade.`,
         ),
       );
     }
@@ -343,3 +343,4 @@ export async function registerInstalledPlugins(
 
   return registered;
 }
+

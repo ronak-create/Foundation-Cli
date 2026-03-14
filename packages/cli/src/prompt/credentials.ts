@@ -414,3 +414,4 @@ export function getRequiredCredentialGroups(
 
   return result;
 }
+

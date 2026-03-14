@@ -1,10 +1,12 @@
 import fs from "node:fs/promises";
 import type { Dirent } from "node:fs";
 import path from "node:path";
-import type { PluginDefinition, ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition, ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 import { DuplicateModuleError, ModuleNotFoundError } from "../errors.js";
 import { ManifestValidator } from "../manifest-validator/validator.js";
 import type { SandboxedHooks } from "../plugin-installer/plugin-installer.js";
+import { ORMService } from "../orm/orm-service.js";
+import { GeneratorService } from "../generator/generator-service.js";
 // import type { HookName } from "../execution/hook-runner.js";
 
 export type ModuleSource = "builtin" | "plugin";
@@ -17,9 +19,27 @@ interface RegistryEntry {
 export class ModuleRegistry {
   readonly #entries: Map<string, RegistryEntry> = new Map();
 
+  /**
+   * Shared ORM coordination service.
+   * ORM modules register their provider here during `onRegister`.
+   * Feature modules register models here during `onRegister`.
+   * The composition engine calls `orm.buildSchemaFiles()` to get the
+   * provider-generated schema FileEntry additions.
+   */
+  readonly orm: ORMService = new ORMService();
+
+  /**
+   * Shared code generator registry.
+   * Modules register generators here during `onRegister`.
+   * The `foundation generate` command discovers and invokes them.
+   */
+  readonly generators: GeneratorService = new GeneratorService();
+
   registerModule(plugin: PluginDefinition): void {
     this.#register(plugin, "builtin");
   }
+
+  // … rest of class unchanged …
 
   /**
    * Registers a third-party plugin with hooks stripped from the live object.

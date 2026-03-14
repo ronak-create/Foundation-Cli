@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const APP_VUE = `<template>
   <main class="min-h-screen flex flex-col items-center justify-center">

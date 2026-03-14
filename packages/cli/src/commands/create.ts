@@ -7,12 +7,12 @@ import {
   runExecutionPipeline,
   renderAllTemplates,
   type PipelineEvent,
-} from "@foundation-cli/core";
+} from "@systemlabs/foundation-core";
 import {
   loadBuiltinModules,
   discoverBuiltinModules,
   selectionsToModuleIds,
-} from "@foundation-cli/modules";
+} from "@systemlabs/foundation-modules";
 import { runPromptFlow } from "../prompt/flow.js";
 import { writeEnvFiles } from "../execution/env-writer.js";
 import {
@@ -87,7 +87,7 @@ export async function runCreateCommand(): Promise<void> {
       );
 
       const planSpinner = createStepSpinner("Building composition plan…");
-      plan = buildCompositionPlan(resolution.ordered);
+      plan = buildCompositionPlan(resolution.ordered, registry.orm);
       planSpinner.succeed(
         chalk.dim(
           `Composition plan ready  ` +
@@ -174,12 +174,74 @@ export async function runCreateCommand(): Promise<void> {
 
   stop();
 
-  // ── 9. Write base files ───────────────────────────────────────────────────
+  // ── 9. Sync .env from .env.example ───────────────────────────────────────
+  // After the pipeline has written all .env.example keys (PORT, NODE_ENV,
+  // CORS_ORIGIN, NEXT_PUBLIC_APP_URL, etc.), copy any keys that are in
+  // .env.example but missing from .env — using the example file's default
+  // values. This ensures `foundation doctor` passes without the user needing
+  // to manually create .env from .env.example.
+  await syncEnvFromExample(targetDir);
+
+  // ── 10. Write base files ──────────────────────────────────────────────────
   const baseSpinner = createStepSpinner("Writing base project files…");
   await writeBaseFiles(targetDir, selection.projectName, selection.rawSelections);
   baseSpinner.succeed(chalk.dim("Base files written"));
 
   printSuccess(selection.projectName);
+}
+
+// ── Sync .env from .env.example ───────────────────────────────────────────────
+
+/**
+ * Reads .env.example and copies any keys that are missing from .env,
+ * using the example's default values. Keys already in .env are preserved.
+ * This fills in non-credential config values (PORT, NODE_ENV, etc.) that
+ * modules write to .env.example but credential-collector doesn't collect.
+ */
+async function syncEnvFromExample(targetDir: string): Promise<void> {
+  const fsSync = await import("node:fs/promises");
+  const pathSync = await import("node:path");
+
+  const envPath        = pathSync.default.join(targetDir, ".env");
+  const envExamplePath = pathSync.default.join(targetDir, ".env.example");
+
+  let exampleContent: string;
+  try {
+    exampleContent = await fsSync.default.readFile(envExamplePath, "utf-8");
+  } catch {
+    return; // no .env.example — nothing to sync
+  }
+
+  let envContent = "";
+  try {
+    envContent = await fsSync.default.readFile(envPath, "utf-8");
+  } catch {
+    // .env doesn't exist yet — will be created
+  }
+
+  // Parse existing .env keys
+  const existingKeys = new Set(
+    envContent.split("\n")
+      .filter(l => l.trim() && !l.trim().startsWith("#") && l.includes("="))
+      .map(l => l.slice(0, l.indexOf("=")).trim()),
+  );
+
+  // Collect keys from .env.example that are missing from .env
+  const toAppend: string[] = [];
+  for (const line of exampleContent.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#") || !trimmed.includes("=")) continue;
+    const key = trimmed.slice(0, trimmed.indexOf("=")).trim();
+    if (!existingKeys.has(key)) {
+      toAppend.push(line); // copy with default value from .env.example
+    }
+  }
+
+  if (toAppend.length === 0) return;
+
+  const separator = envContent && !envContent.endsWith("\n") ? "\n" : "";
+  const addition  = "\n# Config defaults (from .env.example)\n" + toAppend.join("\n") + "\n";
+  await fsSync.default.writeFile(envPath, envContent + separator + addition, "utf-8");
 }
 
 // ── Base files ────────────────────────────────────────────────────────────────

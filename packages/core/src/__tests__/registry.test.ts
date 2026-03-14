@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { ModuleRegistry } from "../module-registry/registry.js";
 import { DuplicateModuleError, ModuleNotFoundError } from "../errors.js";
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 function makePlugin(id: string, overrides: Partial<PluginDefinition["manifest"]> = {}): PluginDefinition {
   return {

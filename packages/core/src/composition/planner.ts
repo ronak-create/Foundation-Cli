@@ -3,12 +3,13 @@ import type {
   FileEntry,
   PackageDependency,
   ConfigPatch,
-} from "@foundation-cli/plugin-sdk";
+} from "@systemlabs/foundation-plugin-sdk";
 import type { CompositionPlan } from "../types.js";
 import {
   DuplicateFilePathError,
   ConflictingDependencyVersionError,
 } from "../errors.js";
+import type { ORMService } from "../orm/orm-service.js";
 
 // ── Conflict types ────────────────────────────────────────────────────────────
 
@@ -68,7 +69,7 @@ export function detectDependencyConflicts(
   return conflicts;
 }
 
-// ── buildCompositionPlan (unchanged — still throws on conflict) ───────────────
+// ── buildCompositionPlan ──────────────────────────────────────────────────────
 
 /**
  * Builds a CompositionPlan from an ordered list of ModuleManifests.
@@ -76,11 +77,17 @@ export function detectDependencyConflicts(
  * Throws `ConflictingDependencyVersionError` if any two modules declare
  * the same package at different versions. Use `detectDependencyConflicts`
  * + `buildCompositionPlanWithOverrides` for interactive conflict resolution.
+ *
+ * @param orderedModules  Topologically-sorted module manifests.
+ * @param orm             Optional ORMService from the active ModuleRegistry.
+ *                        When supplied and a provider + models are registered,
+ *                        generated schema files are merged into the plan.
  */
 export function buildCompositionPlan(
   orderedModules: ReadonlyArray<ModuleManifest>,
+  orm?: ORMService,
 ): CompositionPlan {
-  return buildCompositionPlanWithOverrides(orderedModules, new Map());
+  return buildCompositionPlanWithOverrides(orderedModules, new Map(), orm);
 }
 
 // ── buildCompositionPlanWithOverrides ─────────────────────────────────────────
@@ -94,10 +101,16 @@ export function buildCompositionPlan(
  * When an override is present, all modules' declarations for that package are
  * collapsed to the chosen version — no error is thrown.
  * When no override is present and a conflict exists, throws as before.
+ *
+ * @param orderedModules   Topologically-sorted module manifests.
+ * @param versionOverrides Package version override map.
+ * @param orm              Optional ORMService. When provided and a provider +
+ *                         models are registered, schema files are injected.
  */
 export function buildCompositionPlanWithOverrides(
   orderedModules: ReadonlyArray<ModuleManifest>,
   versionOverrides: ReadonlyMap<string, string>,
+  orm?: ORMService,
 ): CompositionPlan {
   const fileMap = new Map<string, { entry: FileEntry; sourceModuleId: string }>();
   const depMap  = new Map<string, { dep: PackageDependency; sourceModuleId: string }>();
@@ -143,6 +156,23 @@ export function buildCompositionPlanWithOverrides(
     // ── Config patches ────────────────────────────────────────────────────────
     for (const patch of manifest.configPatches ?? []) {
       configPatches.push(patch);
+    }
+  }
+
+  // ── ORM schema file injection ─────────────────────────────────────────────
+  // When an ORMService is provided and both a provider and models are
+  // registered, merge the provider-generated schema files into the plan.
+  // Provider files use implicit overwrite semantics: they supersede any
+  // stub file the ORM module declared (e.g. the base prisma/schema.prisma)
+  // because they include all registered models.
+  if (orm !== undefined) {
+    const schemaFiles = orm.buildSchemaFiles();
+    const providerId = orm.getProvider()?.id ?? "orm";
+    for (const schemaFile of schemaFiles) {
+      fileMap.set(schemaFile.relativePath, {
+        entry: { ...schemaFile, overwrite: true },
+        sourceModuleId: providerId,
+      });
     }
   }
 

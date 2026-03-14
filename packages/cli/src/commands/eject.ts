@@ -20,8 +20,8 @@ import {
   FOUNDATION_DIR,
   CONFIG_NAME,
   registerInstalledPlugins
-} from "@foundation-cli/core";
-import { loadBuiltinModules } from "@foundation-cli/modules";
+} from "@systemlabs/foundation-core";
+import { loadBuiltinModules } from "@systemlabs/foundation-modules";
 import { printError, printSection} from "../ui/renderer.js";
 
 // ── Entry point ───────────────────────────────────────────────────────────────

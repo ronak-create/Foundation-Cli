@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const QUERY_CLIENT_TS = `import { QueryClient } from "@tanstack/react-query";
 

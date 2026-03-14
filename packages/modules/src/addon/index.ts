@@ -5,8 +5,8 @@ export { openaiPlugin, OPENAI_AFTER_WRITE_HOOK } from "./openai/index.js";
 import { stripePlugin, STRIPE_AFTER_WRITE_HOOK } from "./stripe/index.js";
 import { redisPlugin, REDIS_AFTER_WRITE_HOOK } from "./redis/index.js";
 import { openaiPlugin, OPENAI_AFTER_WRITE_HOOK } from "./openai/index.js";
-import type { ModuleRegistry } from "@foundation-cli/core";
-import type { SandboxedHooks } from "@foundation-cli/core";
+import type { ModuleRegistry } from "@systemlabs/foundation-core";
+import type { SandboxedHooks } from "@systemlabs/foundation-core";
 
 /**
  * Registers all three official addon plugins into a ModuleRegistry.

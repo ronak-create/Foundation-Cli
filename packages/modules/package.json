@@ -1,6 +1,21 @@
 {
-  "name": "@foundation-cli/modules",
-  "version": "0.0.1",
+  "name": "@systemlabs/foundation-modules",
+  "description": "Built-in modules for databases, backends, auth providers, and services.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ronak-create/Foundation-Cli.git"
+  },
+  "homepage": "https://github.com/ronak-create/Foundation-Cli#readme",
+  "bugs": {
+    "url": "https://github.com/ronak-create/Foundation-Cli/issues"
+  },
+  "keywords": [
+    "cli",
+    "scaffolding",
+    "foundation"
+  ],  
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -15,7 +30,9 @@
       "types": "./dist/registry-loader.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -25,8 +42,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@foundation-cli/plugin-sdk": "workspace:*",
-    "@foundation-cli/core": "workspace:*"
+    "@systemlabs/foundation-plugin-sdk": "0.1.0",
+    "@systemlabs/foundation-core": "0.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

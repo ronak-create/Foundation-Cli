@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const STORE_TS = `import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";

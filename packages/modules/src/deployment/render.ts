@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const RENDER_YAML = `# render.yaml — Infrastructure as Code for Render.com
 # https://render.com/docs/blueprint-spec

@@ -3,7 +3,7 @@ import os from "node:os";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 
 /**
  * Creates a temporary directory and returns its path.

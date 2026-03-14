@@ -246,3 +246,4 @@ export function applyConfigPatch(
     "ERR_UNSUPPORTED_PATCH_TARGET",
   );
 }
+

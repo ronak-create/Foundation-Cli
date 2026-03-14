@@ -21,8 +21,8 @@
 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { ModuleRegistry } from "@foundation-cli/core";
-import { ModuleLoader, type DiscoveryResult } from "@foundation-cli/core";
+import type { ModuleRegistry } from "@systemlabs/foundation-core";
+import { ModuleLoader, type DiscoveryResult } from "@systemlabs/foundation-core";
 
 // Frontend
 import { nextjsModule }        from "./frontend/nextjs.js";
@@ -241,3 +241,4 @@ export function selectionsToModuleIds(
     .map((s) => SELECTION_TO_MODULE_ID[s] ?? s)
     .filter((id) => registry.hasModule(id));
 }
+

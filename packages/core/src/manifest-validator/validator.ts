@@ -1,7 +1,7 @@
 import Ajv, { type ErrorObject } from "ajv";
 import addFormats from "ajv-formats";
-import { MODULE_MANIFEST_SCHEMA } from "@foundation-cli/plugin-sdk";
-import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+import { MODULE_MANIFEST_SCHEMA } from "@systemlabs/foundation-plugin-sdk";
+import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 import { ValidationError, type ValidationFieldError } from "../errors.js";
 
 // ── AJV instance (one per process — compile once, validate many) ──────────────
@@ -175,3 +175,4 @@ export class ManifestValidator {
     return manifest.runtime ?? "node";
   }
 }
+

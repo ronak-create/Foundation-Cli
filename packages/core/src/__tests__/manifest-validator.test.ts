@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { ManifestValidator } from "../manifest-validator/validator.js";
 import { ValidationError } from "../errors.js";
-import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 

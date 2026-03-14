@@ -1,3 +1,30 @@
+// ── ORM Service ───────────────────────────────────────────────────────────────
+export {
+  ORMService,
+  ORMProviderAlreadyRegisteredError,
+  ORMModelAlreadyRegisteredError,
+  ORMProviderNotFoundError,
+  DuplicateSeedError,
+  type ORMProvider,
+  type ORMModelDefinition,
+  type ORMFieldDefinition,
+  type ORMFieldType,
+  type ORMRelationType,
+  type ORMRelationDefinition,
+  type SeedContext,
+  type SeedDefinition,
+} from "./orm/index.js";
+
+// ── Generator Service ─────────────────────────────────────────────────────────
+export {
+  GeneratorService,
+  GeneratorNotFoundError,
+  DuplicateGeneratorError,
+  type GeneratorDefinition,
+  type GeneratorContext,
+  type GeneratorResult,
+} from "./generator/index.js";
+
 // ── FileTransaction ───────────────────────────────────────────────────────────
 export { FileTransaction } from "./file-transaction.js";
 export { safeResolve, normalisePosix, toRelativePosix } from "./path-utils.js";

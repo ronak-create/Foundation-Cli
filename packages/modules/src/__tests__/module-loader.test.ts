@@ -28,7 +28,7 @@ import {
   discoverByCategory,
   discoverRecursive,
   ManifestValidator,
-} from "@foundation-cli/core";
+} from "@systemlabs/foundation-core";
 import {
   loadBuiltinModules,
   discoverBuiltinModules,
@@ -627,7 +627,7 @@ describe("ManifestValidator integration", () => {
 // ── discoverBuiltinModules (integration with real module files) ───────────────
 
 describe("discoverBuiltinModules", () => {
-  it("is exported from @foundation-cli/modules", () => {
+  it("is exported from @systemlabs/foundation-modules", () => {
     expect(typeof discoverBuiltinModules).toBe("function");
   });
 
@@ -802,3 +802,4 @@ describe("static + dynamic combined", () => {
     expect(registry.size).toBe(afterStatic);
   });
 });
+

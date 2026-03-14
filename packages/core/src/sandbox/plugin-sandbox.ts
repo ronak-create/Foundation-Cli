@@ -1,6 +1,6 @@
 import vm from "node:vm";
 import nodeCrypto from "node:crypto";
-import type { PluginHookContext } from "@foundation-cli/plugin-sdk";
+import type { PluginHookContext } from "@systemlabs/foundation-plugin-sdk";
 import { FoundationError } from "../errors.js";
 import { makeSafePath } from "./safe-path.js";
 

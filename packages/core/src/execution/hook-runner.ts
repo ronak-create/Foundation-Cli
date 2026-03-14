@@ -7,7 +7,7 @@
 
 import type { CompositionPlan } from "../types.js";
 import type { ModuleRegistry, ModuleSource } from "../module-registry/registry.js";
-import type { PluginDefinition, PluginHookContext } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition, PluginHookContext } from "@systemlabs/foundation-plugin-sdk";
 import { FoundationError } from "../errors.js";
 import {
   executeSandboxedHook,
@@ -47,7 +47,10 @@ export type HookName =
   | "beforeInstall"
   | "afterInstall"
   | "onFinalize"
-  | "onRollback";
+  | "onRollback"
+  | "onGenerate"
+  | "onStart"
+  | "onBuild";
 
 export interface HookRunnerOptions {
   /** If true, a failing hook throws HookExecutionError and halts the pipeline. */

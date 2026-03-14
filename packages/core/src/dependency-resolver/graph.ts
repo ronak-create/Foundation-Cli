@@ -1,4 +1,4 @@
-import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 import { CircularDependencyError } from "../errors.js";
 
 /**

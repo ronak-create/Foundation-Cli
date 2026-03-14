@@ -1,6 +1,6 @@
 {
   "name": "foundation-cli-monorepo",
-  "private": true,
+  "description": "Foundation CLI monorepo — modular full-stack scaffolding and tooling.",
   "version": "0.0.0",
   "type": "module",
   "engines": {
@@ -27,5 +27,19 @@
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
   },
-  "packageManager": "pnpm@9.0.0"
+  "packageManager": "pnpm@9.0.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ronak-create/Foundation-Cli.git"
+  },
+  "homepage": "https://github.com/ronak-create/Foundation-Cli#readme",
+  "bugs": {
+    "url": "https://github.com/ronak-create/Foundation-Cli/issues"
+  },
+  "keywords": [
+    "cli",
+    "scaffolding",
+    "foundation"
+  ]
 }

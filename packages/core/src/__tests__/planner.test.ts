@@ -4,7 +4,7 @@ import {
   DuplicateFilePathError,
   ConflictingDependencyVersionError,
 } from "../errors.js";
-import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 
 function makeManifest(
   id: string,

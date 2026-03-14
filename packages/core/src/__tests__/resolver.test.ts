@@ -7,7 +7,7 @@ import {
   ModuleNotFoundError,
   MissingRequiredModuleError,
 } from "../errors.js";
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 function makePlugin(
   id: string,

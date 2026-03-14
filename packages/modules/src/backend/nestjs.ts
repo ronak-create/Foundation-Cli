@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const APP_MODULE_TS = `import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";

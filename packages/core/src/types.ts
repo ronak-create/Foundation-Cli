@@ -1,4 +1,4 @@
-import type { FileEntry, PackageDependency, ConfigPatch, ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { FileEntry, PackageDependency, ConfigPatch, ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 
 // ── FileTransaction types ─────────────────────────────────────────────────────
 

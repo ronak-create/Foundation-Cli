@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const CLERK_MIDDLEWARE_TS = `import { clerkMiddleware, getAuth } from "@clerk/express";
 import type { Request, Response, NextFunction } from "express";

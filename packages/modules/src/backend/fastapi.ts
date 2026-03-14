@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const MAIN_PY = `from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

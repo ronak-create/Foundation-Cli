@@ -24,7 +24,7 @@ import {
   writeProjectState,
   FOUNDATION_DIR,
 } from "../state/project-state.js";
-import type { ModuleManifest, PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { ModuleManifest, PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const AUTH_SERVICE_TS = `import jwt from "jsonwebtoken";
 import { config } from "dotenv";
@@ -150,3 +150,4 @@ export const jwtModule: PluginDefinition = {
     },
   },
 };
+

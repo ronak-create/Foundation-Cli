@@ -49,6 +49,13 @@ export { vercelModule }      from "./deployment/vercel.js";
 export { renderModule }      from "./deployment/render.js";
 export { awsModule }         from "./deployment/aws.js";
 
+// ── ORM ───────────────────────────────────────────────────────────────────────
+export { prismaModule }      from "./orm/prisma.js";
+export { typeormModule }     from "./orm/typeorm.js";
+export { sqlalchemyModule }  from "./orm/sqlalchemy.js";
+export { mongooseModule }    from "./orm/mongoose.js";
+export { extractORMService, registerProviderFromContext } from "./orm/provider-utils";
+
 // ── Official addon plugins ────────────────────────────────────────────────────
 export {
   loadAddonPlugins,

@@ -20,7 +20,7 @@ import {
   LOCKFILE_NAME,
   // CONFIG_NAME,
 } from "../state/project-state.js";
-// import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+// import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

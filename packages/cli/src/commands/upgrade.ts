@@ -25,8 +25,8 @@ import {
   registerInstalledPlugins,
   type ProjectLockfile,
   type LockfileModuleEntry,
-} from "@foundation-cli/core";
-import { loadBuiltinModules } from "@foundation-cli/modules";
+} from "@systemlabs/foundation-core";
+import { loadBuiltinModules } from "@systemlabs/foundation-modules";
 import { printSection, printError } from "../ui/renderer.js";
 
 // ── Entry point ───────────────────────────────────────────────────────────────

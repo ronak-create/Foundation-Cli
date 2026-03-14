@@ -106,10 +106,10 @@ export async function runCreatePluginCommand(args: ReadonlyArray<string>): Promi
           lint:  "eslint src",
         },
         peerDependencies: {
-          "@foundation-cli/plugin-sdk": "^1.0.0",
+          "@systemlabs/foundation-plugin-sdk": "^1.0.0",
         },
         devDependencies: {
-          "@foundation-cli/plugin-sdk": "^1.0.0",
+          "@systemlabs/foundation-plugin-sdk": "^1.0.0",
           typescript: "^5.0.0",
           vitest:     "^1.0.0",
         },
@@ -233,7 +233,7 @@ function toTitleCase(s: string): string {
 function buildIndexTemplate(moduleId: string): string {
   const varName = toCamelCase(moduleId) + "Plugin";
   const lines = [
-    `import type { PluginDefinition } from "@foundation-cli/plugin-sdk";`,
+    `import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";`,
     `import manifest from "../manifest.json" assert { type: "json" };`,
     ``,
     `// Re-export manifest so the ModuleLoader can discover this plugin`,
@@ -260,7 +260,7 @@ function buildHooksTemplate(packageName: string, moduleId: string): string {
     `// Use ctx.projectRoot to locate the output directory.`,
     ``,
     `/** Called after package manager completes. */`,
-    `/** @param {import('@foundation-cli/plugin-sdk').PluginHookContext} ctx */`,
+    `/** @param {import('@systemlabs/foundation-plugin-sdk').PluginHookContext} ctx */`,
     ["export", `async function afterInstall(ctx) {`].join(" "),
     `  // Example: console.log('[${moduleId}] Installation complete.');`,
     `}`,
@@ -288,3 +288,4 @@ function toCamelCase(s: string): string {
       .join("")
   );
 }
+

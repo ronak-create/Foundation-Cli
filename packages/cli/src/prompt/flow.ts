@@ -21,14 +21,14 @@ import { buildFoundationGraph } from "./graph-definition.js";
 import { inquirerAdapter } from "./adapter.js";
 import { getArchetype } from "./archetypes.js";
 import { printBanner, printSection, printSummaryTable, printAbort } from "../ui/renderer.js";
-import type { ModuleRegistry } from "@foundation-cli/core";
+import type { ModuleRegistry } from "@systemlabs/foundation-core";
 import { collectCredentials, type CollectedCredentials } from "./credential-collector.js";
 
 // ── Public types ───────────────────────────────────────────────────────────────
 
 /**
  * The seven stack selections that drive module resolution.
- * Keys correspond to SELECTION_TO_MODULE_ID in @foundation-cli/modules.
+ * Keys correspond to SELECTION_TO_MODULE_ID in @systemlabs/foundation-modules.
  */
 export interface RawSelections {
   readonly frontend: string;
@@ -201,7 +201,7 @@ export async function runPromptFlow(
   // - deprecated:   always warn with successor info
   // - removed:      hard error with migration guide URL
   if (registry) {
-    const { SELECTION_TO_MODULE_ID } = await import("@foundation-cli/modules");
+    const { SELECTION_TO_MODULE_ID } = await import("@systemlabs/foundation-modules");
 
     const map: Record<string, string> = SELECTION_TO_MODULE_ID as Record<string, string>;
 
@@ -269,7 +269,7 @@ export async function runPromptFlow(
   }
 
   // ── 5. Derive ordered module list ─────────────────────────────────────────
-  // selectionsToModuleIds lives in @foundation-cli/modules and is called
+  // selectionsToModuleIds lives in @systemlabs/foundation-modules and is called
   // in create.ts. Here we expose the raw ordered list as `selectedModules`
   // so callers (and tests) can inspect it without re-deriving it.
   const selectedModules = deriveModuleList(rawSelections);
@@ -379,3 +379,4 @@ function withSectionHeaders(base: typeof inquirerAdapter): typeof inquirerAdapte
     },
   };
 }
+

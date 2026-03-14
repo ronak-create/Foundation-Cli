@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import ora, { type Ora } from "ora";
-import type { PipelineEvent, PipelineStage } from "@foundation-cli/core";
+import type { PipelineEvent, PipelineStage } from "@systemlabs/foundation-core";
 
 const SEP_FULL = chalk.dim("━".repeat(52));
 const SEP_THIN = chalk.dim("─".repeat(52));

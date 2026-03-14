@@ -206,3 +206,4 @@ export interface PromptAdapter {
     defaultValue?: boolean;
   }): Promise<boolean>;
 }
+

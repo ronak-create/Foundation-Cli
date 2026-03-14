@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const DB_CLIENT_TS = `import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";

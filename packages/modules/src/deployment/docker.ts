@@ -1,4 +1,4 @@
-import type { PluginDefinition, PluginHookContext } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition, PluginHookContext } from "@systemlabs/foundation-plugin-sdk";
 
 const DOCKERFILE = `# syntax=docker/dockerfile:1
 FROM node:20-alpine AS base

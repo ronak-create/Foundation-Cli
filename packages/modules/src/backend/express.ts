@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@foundation-cli/plugin-sdk";
+import type { PluginDefinition } from "@systemlabs/foundation-plugin-sdk";
 
 const SERVER_TS = `import express from "express";
 import cors from "cors";
@@ -106,3 +106,4 @@ export const expressModule: PluginDefinition = {
     },
   },
 };
+

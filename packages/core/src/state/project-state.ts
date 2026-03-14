@@ -11,7 +11,7 @@ import {
   type LockfileModuleEntry,
   type LockfilePluginEntry,
 } from "./lockfile.js";
-import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -271,3 +271,4 @@ async function readFileSafe(filePath: string): Promise<string | null> {
     throw new StateReadError(filePath, err);
   }
 }
+

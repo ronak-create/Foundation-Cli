@@ -4,7 +4,7 @@ import path from "node:path";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
 import { FoundationError } from "../errors.js";
-// import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+// import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 
 // ── Errors ────────────────────────────────────────────────────────────────────
 
@@ -208,3 +208,4 @@ export async function cleanupFetchTemp(tempDir: string): Promise<void> {
     // best-effort
   }
 }
+

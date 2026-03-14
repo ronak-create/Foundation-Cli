@@ -17,7 +17,7 @@ import {
   type WriteStateOptions,
   type ProjectLockfile,
 } from "../state/index.js";
-import type { ModuleManifest } from "@foundation-cli/plugin-sdk";
+import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -643,3 +643,4 @@ describe("runExecutionPipeline — state integration", () => {
     expect(stages).toContain("write-state");
   });
 });
+
