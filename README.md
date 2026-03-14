@@ -1,9 +1,9 @@
 # Foundation CLI
 
-> **A modular project composition engine. Not a template copier.**
+> **A modular project composition engine with a plugin ecosystem.**
 
 ```bash
-npx create-foundation-app
+npx @systemlabs/foundation-cli create .
 ```
 
 A senior developer should be able to go from zero to a running, linted, type-checked, database-connected app with auth in under 3 minutes — no manual config editing, no missing dependencies, no broken imports.
@@ -26,10 +26,10 @@ Foundation CLI is a **dependency-aware project assembler**. You describe your in
 
 ```bash
 # One-shot bootstrap (no prior install needed)
-npx create-foundation-app
+npx @systemlabs/foundation-cli
 
 # Or install globally for repeated use
-npm install -g @foundation-cli/cli
+npm install -g @systemlabs/foundation-cli
 foundation create my-app
 ```
 
@@ -57,7 +57,7 @@ foundation create my-app
   Svelte
   None
 
-[ ... Backend, Database, Auth, UI, Deployment ... ]
+[ ... Backend, Database, ORM, Auth, UI, Deployment ... ]
 
 ┌─ Review & Confirm ────────────────────────────────┐
 │  ✔ Frontend:    Next.js                           │
@@ -81,10 +81,91 @@ foundation create my-app
 │  🎉 my-saas-app is ready.                         │
 │                                                   │
 │  cd my-saas-app                                   │
-│  cp .env.example .env                             │
-│  docker-compose up -d                             │
 │  npm run dev                                      │
 └───────────────────────────────────────────────────┘
+```
+
+---
+
+## Commands
+
+```bash
+# Create a new project (interactive)
+foundation create [project-name]
+foundation new [project-name]           # alias for create
+
+# Create with an archetype preset (non-interactive / CI mode)
+foundation create my-app --preset saas
+
+# ── Module management ──────────────────────────────────────────────────────────
+
+# Add a built-in module or third-party plugin to an existing project
+foundation add orm-prisma               # built-in module by short name
+foundation add auth-jwt                 # built-in module
+foundation add stripe                   # official add-on plugin
+foundation add foundation-plugin-redis  # community plugin from npm
+
+# Switch a category to a different module (safely re-composes project)
+foundation switch orm prisma
+foundation switch backend nestjs
+foundation switch database mongodb
+
+# Search the plugin registry on npm
+foundation search <query>
+
+# ── Code generation ────────────────────────────────────────────────────────────
+
+# Generate an ORM model with interactive field prompts
+foundation generate model Post
+
+# Generate a full CRUD scaffold (model + service + controller + routes)
+foundation generate crud Post
+
+# List all available generators
+foundation generate --list
+
+# ── Project inspection ─────────────────────────────────────────────────────────
+
+# Show project info: stack, modules, ORM provider, plugins
+foundation info
+
+# Run health checks: Node version, env vars, module compatibility, ORM validity
+foundation doctor
+
+# Validate project.lock and foundation.config.json
+foundation validate
+
+# ── Dev automation ─────────────────────────────────────────────────────────────
+
+# Start the development server (delegates to npm run dev)
+foundation dev
+
+# Run the test suite (delegates to npm run test)
+foundation test
+
+# Database operations — ORM-aware script delegation
+foundation db migrate    # npm run db:migrate  /  alembic upgrade head
+foundation db seed       # npm run db:seed
+foundation db reset      # npm run db:reset
+foundation db studio     # npm run db:studio   (Prisma only)
+foundation db push       # npm run db:push     (Prisma only)
+
+# ── Tooling ────────────────────────────────────────────────────────────────────
+
+# Copy module files into your project for full customisation
+foundation eject [module-id]
+
+# Upgrade modules using the project lockfile
+foundation upgrade [--dry-run]
+
+# Scaffold a new plugin package with full SDK setup
+foundation create-plugin [name]
+
+# ── AI assistant (optional — requires API key) ─────────────────────────────────
+
+# Describe your app in natural language; the CLI installs modules and generates
+# models automatically. Requires ANTHROPIC_API_KEY or OPENAI_API_KEY.
+foundation ai "create a blog system with comments and JWT auth"
 ```
 
 ---
@@ -117,6 +198,16 @@ Every option below has a fully-implemented module that generates real, compile-r
 | MongoDB | `database-mongodb` | src/db/client.ts (native driver), 001_init.js |
 | SQLite | `database-sqlite` | src/db/client.ts (better-sqlite3, WAL), 001_init.sql |
 | Supabase | `database-supabase` | src/db/client.ts (anon + admin clients), init migration |
+
+### ORM
+| Option | Module ID | Key Files Generated |
+|--------|-----------|---------------------|
+| Prisma | `orm-prisma` | prisma/schema.prisma, src/lib/db.ts (PrismaClient) |
+| TypeORM | `orm-typeorm` | src/data-source.ts, src/entities/User.entity.ts |
+| Mongoose | `orm-mongoose` | src/lib/db.ts, src/models/User.model.ts |
+| SQLAlchemy | `orm-sqlalchemy` | src/database.py, src/models.py, alembic.ini |
+
+ORM modules integrate with `foundation generate model` and `foundation generate crud` — they translate portable model definitions into provider-specific schema files.
 
 ### Authentication
 | Option | Module ID | Key Files Generated |
@@ -176,106 +267,263 @@ Pick an archetype and every downstream question is pre-answered with battle-test
 
 ---
 
-## Commands
+## Code Generation
+
+Foundation CLI includes a built-in code generator that integrates with your active ORM.
 
 ```bash
-# Create a new project (interactive)
-foundation create [project-name]
+# Interactively define fields and generate ORM schema files
+foundation generate model Post
 
-# Create with an archetype preset (non-interactive)
-foundation create my-app --preset saas
+# Generate full CRUD: model + service + controller + routes
+foundation generate crud Post
 
-# Install an add-on plugin into an existing Foundation project
-foundation add stripe
-foundation add redis
-foundation add openai
+# List all available generators (including those from installed modules)
+foundation generate --list
+```
 
-# Search the plugin registry
-foundation search <query>
+The generator prompts for field definitions interactively:
 
-# Copy module files into your project for full customisation
-foundation eject [module-id]
+```
+  Define fields for Post
+────────────────────────────────────────────────────
+  ℹ  "id" (uuid, primaryKey) added automatically
 
-# Upgrade modules using the project lockfile
-foundation upgrade
+? Field name (empty to finish): title
+? Type for "title": string  — text / varchar
+? Is "title" required (non-nullable)? yes
+? Is "title" unique? no
+  ✔  Added: title (string)
 
-# Scaffold a new plugin with SDK setup
-foundation create-plugin
+? Field name (empty to finish):
+  ℹ  "createdAt" and "updatedAt" (date, generated) added automatically
+```
 
-# Validate your project's foundation.config.json and lock file
-foundation validate
+Generated files are ORM-aware:
+
+| Active ORM | Model output | CRUD output |
+|------------|-------------|-------------|
+| Prisma | `prisma/schema.prisma` (model block appended) | `src/services/`, `src/controllers/`, `src/routes/` |
+| TypeORM | `src/entities/Post.entity.ts` | Express or NestJS controllers |
+| Mongoose | `src/models/Post.model.ts` | Express controllers |
+| SQLAlchemy | `src/post.py` (mapped class) | FastAPI router + Pydantic schemas |
+
+Relations between models are supported via `ORMRelationDefinition` — providers translate `many-to-one`, `one-to-many`, `one-to-one`, and `many-to-many` into provider-specific syntax.
+
+---
+
+## ORM Integration
+
+The ORM layer uses a **portable model system** — feature modules declare models using a provider-agnostic format, and the active ORM provider generates the correct output.
+
+```typescript
+// Any module's onRegister hook can register a model
+registry.orm.registerModel({
+  id:     "auth.Session",
+  name:   "Session",
+  fields: [
+    { name: "id",        type: "uuid",   primaryKey: true, generated: true },
+    { name: "token",     type: "string", required: true, unique: true },
+    { name: "expiresAt", type: "date",   required: true },
+  ],
+  relations: [
+    { name: "user", type: "many-to-one", target: "User" },
+  ],
+}, "auth-jwt");
+```
+
+This model is then translated by the active provider into:
+- **Prisma** → `model Session { ... @relation(...) }` block in `schema.prisma`
+- **TypeORM** → `Session.entity.ts` with `@ManyToOne(() => User)` decorator
+- **Mongoose** → `Session.model.ts` with `userId: { type: ObjectId, ref: "User" }`
+- **SQLAlchemy** → `session.py` with `user = relationship("User")`
+
+Modules can also register seed functions:
+
+```typescript
+registry.orm.registerSeed({
+  id: "auth.adminUser",
+  run: async (db) => {
+    await db.create("User", { email: "admin@example.com" });
+  },
+}, "auth-jwt");
+
+// Then run all seeds:
+// foundation db seed
 ```
 
 ---
 
-## Monorepo Structure
+## Stack Switcher
+
+Switch your active ORM, backend, or database without manually editing files:
+
+```bash
+foundation switch orm prisma        # switch from typeorm to prisma
+foundation switch backend nestjs    # switch from express to nestjs
+foundation switch database mongodb  # switch from postgresql to mongodb
+```
+
+The CLI validates compatibility (no conflicts with remaining modules), re-composes only the affected files, and updates `project.lock` and `foundation.config.json`.
+
+---
+
+## AI Assistant (Optional)
+
+Describe your application in plain English and let the CLI install modules, generate models, and scaffold CRUD automatically.
+
+```bash
+# Requires ANTHROPIC_API_KEY or OPENAI_API_KEY in your environment
+foundation ai "create a blog system with posts, comments, and JWT auth"
+```
+
+The CLI sends your prompt to the model with a system prompt that includes the full module catalogue. The model returns a structured plan:
+
+```json
+{
+  "modules":  ["auth-jwt", "database-postgresql", "orm-prisma"],
+  "models":   [{ "name": "Post", "fields": [...] }, { "name": "Comment", "fields": [...] }],
+  "generate": ["Post", "Comment"]
+}
+```
+
+The CLI then runs `foundation add` for each module, `foundation generate model` for each model definition, and `foundation generate crud` for each CRUD resource — in sequence.
+
+**Setup:**
+
+```bash
+# Add to your shell profile or .env:
+export ANTHROPIC_API_KEY=sk-ant-...
+# or
+export OPENAI_API_KEY=sk-...
+```
+
+If no API key is set, `foundation ai` prints a setup guide and exits cleanly — no error.
+
+---
+
+## Project Health
+
+```bash
+# Show project info: stack, modules, ORM provider, plugins
+foundation info
+
+# Run diagnostics: Node version, env vars, module compatibility, ORM validity
+foundation doctor
+```
+
+`foundation doctor` output:
 
 ```
-foundation-cli/                         ← pnpm workspace root
-│
-├── packages/
-│   ├── cli/                            ← @foundation-cli/cli
-│   │   └── src/
-│   │       ├── bin.ts                  ← executable entry point
-│   │       ├── commands/               ← create, add, eject, search, upgrade, validate
-│   │       ├── prompt/                 ← PromptGraph engine, archetypes, question DAG
-│   │       ├── generator/              ← orchestrates core pipeline
-│   │       ├── conflict-resolver.ts
-│   │       └── ui/renderer.ts          ← terminal output (Chalk, Ora)
-│   │
-│   ├── core/                           ← @foundation-cli/core  (no CLI deps)
-│   │   └── src/
-│   │       ├── composition/            ← CompositionPlanner
-│   │       ├── dependency-resolver/    ← graph.ts, resolver.ts
-│   │       ├── execution/              ← pipeline, hook-runner, config-merger,
-│   │       │                               dependency-installer, project-writer
-│   │       ├── file-merger/            ← json-merge.ts, requirements-merge.ts
-│   │       ├── file-transaction.ts     ← atomic stage → commit / rollback
-│   │       ├── installer/              ← npm / pip detection + install
-│   │       ├── manifest-validator/     ← AJV JSON Schema validation
-│   │       ├── module-registry/        ← registry, loader, dynamic discovery
-│   │       ├── plugin-installer/       ← npm-fetcher, plugin-installer
-│   │       ├── registry-search/        ← npm registry search
-│   │       ├── sandbox/                ← plugin-sandbox, safe-path
-│   │       ├── state/                  ← lockfile, project-state
-│   │       ├── templating/render.ts    ← EJS template engine
-│   │       ├── path-utils.ts
-│   │       ├── errors.ts
-│   │       └── types.ts
-│   │
-│   ├── modules/                        ← @foundation-cli/modules  (all built-in modules)
-│   │   └── src/
-│   │       ├── frontend/               ← nextjs, react-vite, vue, svelte
-│   │       ├── backend/                ← express, nestjs, fastapi, django
-│   │       ├── database/               ← postgresql, mysql, mongodb, sqlite, supabase
-│   │       ├── auth/                   ← jwt, oauth, session, clerk, auth0
-│   │       ├── ui/                     ← tailwind, shadcn, mui, chakra, bootstrap
-│   │       ├── state/                  ← zustand, redux, tanstack-query
-│   │       ├── deployment/             ← docker, vercel, render, aws
-│   │       ├── addon/                  ← stripe, redis, openai (official plugins)
-│   │       ├── index.ts                ← all module exports
-│   │       └── registry-loader.ts      ← static + dynamic module registration
-│   │
-│   ├── plugin-sdk/                     ← @foundation-cli/plugin-sdk
-│   │   └── src/
-│   │       ├── types.ts                ← PluginDefinition, ModuleManifest, hooks
-│   │       ├── schema.ts               ← JSON Schema for manifest validation
-│   │       └── validate.ts             ← validateManifest()
-│   │
-│   └── testing/                        ← @foundation-cli/testing
-│       └── src/
-│           ├── fixtures.ts             ← mock manifests, mock file trees
-│           └── index.ts                ← scaffold harness, snapshot utils
-│
-├── pnpm-workspace.yaml
-└── turbo.json                          ← Turborepo task graph
+  Foundation Doctor
+────────────────────────────────────────────────────
+  ✔  Node.js version            v20.11.0 (≥ v18 required)
+  ✔  Foundation project         .foundation/project.lock found
+  ✔  project.lock               Valid
+  ✔  foundation.config.json     Valid
+  ✔  CLI version                v0.0.1
+  ✔  Module registry            All 7 module(s) found
+  ✔  Module compatibility       No conflicts detected
+  ✔  Environment variables      All 9 key(s) present in .env
+  ✔  ORM provider               Prisma (orm-prisma)
+  9 passed
 ```
+
+---
+
+## Plugin System
+
+Foundation CLI is designed to grow through community plugins. A plugin is a module published to npm with the `foundation-plugin` keyword.
+
+### Install a Plugin
+
+```bash
+foundation add stripe
+foundation add redis
+foundation add openai
+foundation add foundation-plugin-<name>   # any community plugin
+```
+
+`foundation add` resolves built-in module short names first (`auth-jwt`, `orm-prisma`, etc.) before hitting npm, so it works for both built-in modules and third-party plugins with the same command.
+
+### Build a Plugin
+
+```bash
+foundation create-plugin my-plugin-name
+```
+
+A plugin package:
+
+```
+foundation-plugin-stripe/
+├── manifest.json        ← validated against ModuleManifest schema
+├── hooks.mjs            ← lifecycle hooks (sandboxed execution)
+├── files/               ← EJS template files
+├── patches/             ← config patch files
+└── package.json         ← must include 'foundation-plugin' keyword
+```
+
+### Plugin Trust Tiers
+
+| Tier | Requirements | Benefit |
+|------|-------------|---------|
+| Community | Published to npm with `foundation-plugin` keyword | Full plugin API |
+| Verified | Passed security audit; pinned manifest hash | Shown first in `foundation search` |
+| Official | Maintained by Foundation CLI org | Extended API surface; bundled with CLI |
+
+---
+
+## Module Manifest Contract
+
+Every module — first-party or third-party plugin — must conform to this schema:
+
+```typescript
+interface ModuleManifest {
+  id:          string;
+  name:        string;
+  version:     string;
+  category:    "frontend" | "backend" | "database" | "orm" | "auth"
+               | "ui" | "state" | "deployment" | "addon" | "generate"
+               | "testing" | "tooling";
+  description: string;
+  runtime?:    "node" | "python" | "multi";
+  provides?:   string[];            // capability tokens
+  requires?:   string[];            // capability tokens this module needs
+  dependencies: PackageDependency[];
+  files:        FileEntry[];
+  configPatches: ConfigPatch[];
+  compatibility: {
+    conflicts?:      string[];
+    compatibleWith?: Record<string, string[]>;
+    peerFrameworks?: Record<string, string>;
+  };
+}
+```
+
+Modules may export lifecycle hooks:
+
+| Hook | When | Notes |
+|------|------|-------|
+| `onRegister` | Registry load time | ORM providers register here |
+| `onBeforeCompose` | Before template render | Inject dynamic variables |
+| `onAfterTemplate` | After render, before merge | Post-process rendered files |
+| `onMerge` | During config merge | Custom merge logic |
+| `onAfterCompose` | After all files staged | Cross-module wiring |
+| `beforeWrite` | Before file-write transaction commits | — |
+| `afterWrite` | After file-write transaction commits | — |
+| `beforeInstall` | Before package manager runs | — |
+| `afterInstall` | After package manager completes | Run post-install scripts |
+| `onFinalize` | After full success | Print post-install instructions |
+| `onRollback` | On any failure | Clean up side-effects |
+| `onGenerate` | Before generator writes files | Extend generated output |
+| `onStart` | When `foundation dev` is invoked | Dev-time setup |
+| `onBuild` | When `foundation build` is invoked | Build-time steps |
 
 ---
 
 ## Architecture
 
-Foundation CLI is built around five subsystems that communicate through typed interfaces. No subsystem writes directly to disk — all file operations go through the `FileTransaction` model.
+Foundation CLI is built around six subsystems that communicate through typed interfaces. No subsystem writes directly to disk — all file operations go through the `FileTransaction` model.
 
 ### Data Flow
 
@@ -293,7 +541,9 @@ Dependency Resolver ──► ResolvedPlan | ConflictReport
       │  (abort on unresolved conflicts)
       ▼
 Composition Engine ──► ExecutionPlan (topological order)
-      │
+      │        │
+      │        └──► ORM Service ──► Schema FileEntries
+      │                  (registry.orm.buildSchemaFiles())
       ├──► Template Engine ──► RenderedFiles  (EJS)
       │
       └──► Merge Engine ──► MergedConfigs
@@ -301,7 +551,7 @@ Composition Engine ──► ExecutionPlan (topological order)
                 ▼
          FileTransaction.stage(files)
                 │
-                ▼  (all hooks passed? post-validate?)
+                ▼
          FileTransaction.commit() ──► Output Directory
                 │
                 ▼
@@ -313,129 +563,78 @@ Composition Engine ──► ExecutionPlan (topological order)
 
 ### Key Subsystems
 
-**PromptGraph Engine** — A directed acyclic graph of prompt nodes. Questions only appear when their `when` predicate is satisfied (e.g., the "UI framework" question is hidden if `frontend = none`). Each node can inject defaults into downstream nodes via `onAnswer` hooks, which powers the archetype system.
+**PromptGraph Engine** — A DAG of prompt nodes. Questions only appear when their `when` predicate is satisfied. Each node can inject defaults via `onAnswer` hooks, powering the archetype system.
 
-**Dependency Resolver** — Resolves the full module graph using capability tokens, not module names directly. Detects conflicts (two auth modules), performs topological sort via Kahn's algorithm, and builds separate package install trees per runtime (Node.js vs Python). Hard conflicts block generation; advisory conflicts show warnings.
+**Dependency Resolver** — Resolves the full module graph using capability tokens. Detects conflicts, performs topological sort via Kahn's algorithm, and auto-injects missing capability providers (with interactive selection prompts for alternatives).
 
-**Composition Engine** — Executes modules in dependency-safe order. For each module it calls the Template Engine, feeds results to the Merge Engine, and runs lifecycle hooks at each stage.
+**ORM Service** (`registry.orm`) — Portable model layer. Stores one active `ORMProvider` and an ordered model map. `buildSchemaFiles()` delegates to the provider which translates `ORMModelDefinition[]` (including relation definitions) into provider-specific `FileEntry[]`. Supports seed registration via `registerSeed()` / `runSeeds()`.
 
-**File Merge Engine** — Type-aware merging per file format: deep merge for `package.json` and `tsconfig.json`, key-deduplication for `.env`, semver intersection for `requirements.txt`, and service-merge for `docker-compose.yml`. Conflicts that can't be auto-resolved are escalated as structured errors.
+**Generator Service** (`registry.generators`) — Registry of code generators. Modules register generators in `onRegister`; `foundation generate <id>` invokes them. Built-in generators: `model` and `crud`.
+
+**File Merge Engine** — Type-aware merging: deep merge for `package.json`/`tsconfig.json`, key-deduplication for `.env`, semver intersection for `requirements.txt`, service-merge for `docker-compose.yml`.
 
 **FileTransaction** — Atomic file operations. All writes are staged to a temp directory. On any failure the temp dir is deleted and the output directory is left untouched. No partial scaffolds.
 
 ---
 
-## Module Manifest Contract
-
-Every module — first-party or third-party plugin — must conform to this schema. Non-conforming modules are rejected at registry load time by the AJV validator.
-
-```typescript
-interface ModuleManifest {
-  id:          string;            // kebab-case, unique
-  name:        string;            // display name
-  version:     string;            // semver
-  category:    "frontend" | "backend" | "database" | "auth"
-               | "ui" | "state" | "deployment" | "addon";
-  description: string;
-  dependencies: PackageDependency[];   // npm / pip packages
-  files:        FileEntry[];           // content to write
-  configPatches: ConfigPatch[];        // package.json, tsconfig, .env merges
-  compatibility: {
-    conflicts: string[];               // module IDs that cannot coexist
-  };
-}
-```
-
-Modules may also export lifecycle hooks:
-
-| Hook | When | Can Abort? |
-|------|------|-----------|
-| `onRegister` | Registry load time | Yes |
-| `onBeforeCompose` | Before template render | Yes |
-| `onAfterTemplate` | After render, before merge | No |
-| `onAfterCompose` | After all files staged | Yes |
-| `onBeforeInstall` | Before package manager | Yes |
-| `onAfterInstall` | After install completes | No |
-| `onFinalize` | After full success | No |
-| `onRollback` | On any failure | No |
-
----
-
-## Plugin System
-
-Foundation CLI is designed to grow through community plugins. A plugin is just a module published to npm with the `foundation-plugin` keyword — there is no second-class API.
-
-### Install a Plugin
-
-```bash
-foundation add stripe
-foundation add redis
-foundation add openai
-```
-
-### Build a Plugin
-
-```bash
-# Scaffold a new plugin with full SDK setup
-foundation create-plugin my-plugin-name
-```
-
-A plugin package looks like:
+## Monorepo Structure
 
 ```
-foundation-plugin-stripe/
-├── manifest.json        ← validated against ModuleManifest schema
-├── hooks.mjs            ← lifecycle hooks (sandboxed execution)
-├── files/               ← EJS template files
-├── patches/             ← config patch files
-└── package.json         ← must include 'foundation-plugin' keyword
+foundation-cli/
+├── packages/
+│   ├── cli/                            ← user-facing commands + prompts
+│   │   └── src/
+│   │       ├── commands/               ← create, new, add, switch, generate,
+│   │       │                               info, doctor, dev, db, test,
+│   │       │                               eject, upgrade, validate,
+│   │       │                               search, plugins, create-plugin, ai
+│   │       ├── prompt/                 ← PromptGraph engine, archetypes, DAG
+│   │       ├── execution/env-writer.ts ← .env / .env.example merge writer
+│   │       ├── conflict-resolver.ts    ← interactive version conflict resolution
+│   │       └── ui/renderer.ts          ← terminal output (Chalk, Ora)
+│   │
+│   ├── core/                           ← engine (no CLI deps)
+│   │   └── src/
+│   │       ├── composition/            ← CompositionPlanner (ORM-aware)
+│   │       ├── dependency-resolver/    ← graph.ts, resolver.ts
+│   │       ├── execution/              ← pipeline, hook-runner (14 hooks),
+│   │       │                               config-merger, dependency-installer
+│   │       ├── generator/              ← GeneratorService, GeneratorDefinition
+│   │       ├── orm/                    ← ORMService, providers, relations, seeder
+│   │       ├── file-merger/            ← json-merge.ts, requirements-merge.ts
+│   │       ├── file-transaction.ts     ← atomic stage → commit / rollback
+│   │       ├── module-registry/        ← registry (orm + generators), loader
+│   │       ├── plugin-installer/       ← npm-fetcher, plugin-installer
+│   │       ├── sandbox/                ← sandboxed hook execution
+│   │       ├── state/                  ← lockfile, project-state
+│   │       └── templating/render.ts    ← EJS template engine
+│   │
+│   ├── modules/                        ← all built-in modules
+│   │   └── src/
+│   │       ├── frontend/               ← nextjs, react-vite, vue, svelte
+│   │       ├── backend/                ← express, nestjs, fastapi, django
+│   │       ├── database/               ← postgresql, mysql, mongodb, sqlite, supabase
+│   │       ├── orm/                    ← prisma, typeorm, mongoose, sqlalchemy
+│   │       ├── auth/                   ← jwt, oauth, session, clerk, auth0
+│   │       ├── ui/                     ← tailwind, shadcn, mui, chakra, bootstrap
+│   │       ├── state/                  ← zustand, redux, tanstack-query
+│   │       ├── deployment/             ← docker, vercel, render, aws
+│   │       └── addon/                  ← stripe, redis, openai
+│   │
+│   ├── plugin-sdk/                     ← public plugin contract (zero runtime deps)
+│   │   └── src/
+│   │       ├── types.ts                ← PluginDefinition, ModuleManifest, 14 hooks
+│   │       ├── schema.ts               ← JSON Schema for manifest validation
+│   │       └── validate.ts             ← validateManifest()
+│   │
+│   └── testing/                        ← shared test utilities
+│       └── src/
+│           ├── fixtures.ts             ← makeManifestFixture(), createTempDir()
+│           └── index.ts
+│
+├── pnpm-workspace.yaml
+└── turbo.json
 ```
-
-Plugins use `@foundation-cli/plugin-sdk` for full TypeScript types, manifest validation, and a test harness that lets you develop against a mock context without a full CLI install.
-
-### Plugin Trust Tiers
-
-| Tier | Requirements | Benefit |
-|------|-------------|---------|
-| Community | Published to npm with `foundation-plugin` keyword | Full plugin API |
-| Verified | Passed security audit; pinned manifest hash | Shown first in `foundation search` |
-| Official | Maintained by Foundation CLI org | Extended API surface; bundled with CLI |
-
----
-
-## Generated Project Quality
-
-Every generated project is held to these standards before the CLI exits with success:
-
-- TypeScript compiles with `tsc --noEmit` (zero errors)
-- Python files pass `mypy` where applicable
-- `.env.example` is populated with all required environment keys
-- `package.json` scripts are fully wired (`dev`, `build`, `start`)
-- `docker-compose.yml` is valid when Docker is selected
-- Initial SQL migration is included for all SQL databases
-- No broken imports, no missing peer dependencies
-
----
-
-## Testing
-
-```bash
-# Run all tests across the monorepo
-pnpm turbo test
-
-# Run tests for a specific package
-cd packages/core && pnpm test
-cd packages/modules && pnpm test
-cd packages/cli && pnpm test
-```
-
-The test strategy covers:
-
-- **Unit tests** (Vitest) — resolver, merger strategies, manifest validation, transaction model
-- **Integration tests** — compose 2–5 modules and validate output file structure
-- **Snapshot tests** — generated file content for all 20+ known-good combinations
-- **Compilation tests** — generated TypeScript/Python compiles with zero errors
-- **Regression tests** — known-conflict combinations produce correct error messages
 
 ---
 
@@ -443,7 +642,7 @@ The test strategy covers:
 
 ### Prerequisites
 
-- Node.js ≥ 20
+- Node.js ≥ 18
 - pnpm ≥ 9
 
 ### Setup
@@ -467,18 +666,49 @@ pnpm turbo dev
 # Type-check all packages
 pnpm turbo typecheck
 
+# Run all tests
+pnpm turbo test
+
 # Run the CLI locally
 node packages/cli/dist/bin.js create
 ```
 
+### Build Order
+
+Packages must build in this order (enforced by `turbo.json` `dependsOn: ["^build"]`):
+
+```
+plugin-sdk → core → modules → cli
+```
+
 ### Adding a New Module
 
-1. Create `packages/modules/src/<category>/<name>.ts` following an existing module as a template
-2. Export a `PluginDefinition` with a unique `id`, `category`, and all required manifest fields
+1. Create `packages/modules/src/<category>/<name>.ts` following an existing module
+2. Export a `PluginDefinition` with a unique `id` and `category`
 3. Add the export to `packages/modules/src/index.ts`
 4. Add the import + entry to `BUILTIN_MODULES` in `packages/modules/src/registry-loader.ts`
 5. Add the selection → module ID mapping to `SELECTION_TO_MODULE_ID`
-6. Add a choice entry to the appropriate array in `packages/cli/src/prompt/graph-definition.ts`
+6. Add a choice entry to `packages/cli/src/prompt/graph-definition.ts`
+
+For ORM modules, also implement `ORMProvider.buildSchemaFiles()` including relation support, and register the provider in the `onRegister` hook via `registerProviderFromContext`.
+
+---
+
+## Testing
+
+```bash
+pnpm turbo test                  # all packages
+cd packages/core && pnpm test    # core only
+cd packages/modules && pnpm test
+cd packages/cli && pnpm test
+```
+
+Test strategy:
+
+- **Unit** (Vitest) — resolver, merger strategies, manifest validation, ORM service, generator service
+- **Integration** — compose 2–5 modules, validate output file structure
+- **Snapshot** — generated file content for known-good combinations
+- **Compilation** — generated TypeScript/Python compiles with zero errors
 
 ---
 
@@ -486,11 +716,11 @@ node packages/cli/dist/bin.js create
 
 ### `.foundation/project.lock`
 
-Generated in every scaffolded project. Records exact module versions, plugin versions, and CLI version used. `foundation upgrade` reads this file to compute a safe upgrade path.
+Records exact module versions, plugin versions, and CLI version. Read by `foundation upgrade`, `foundation switch`, `foundation info`, and `foundation doctor`.
 
 ### `.foundation/foundation.config.json`
 
-Stores user choices and installed plugins for an existing Foundation project. Used by `foundation add` and `foundation eject`.
+Stores user selections and installed plugins. Read by `foundation add`, `foundation switch`, `foundation generate`, and `foundation eject`.
 
 ---
 
@@ -498,18 +728,14 @@ Stores user choices and installed plugins for an existing Foundation project. Us
 
 | Phase | Status | Highlights |
 |-------|--------|-----------|
-| Phase 0 — Skeleton | ✅ Done | Monorepo, all TypeScript interfaces, FileTransaction, CI |
-| Phase 1 — MVP | ✅ Done | PromptGraph, DependencyResolver, TemplateEngine, MergeEngine, 6 core modules |
-| Phase 2 — Full Coverage | ✅ Done | All 28 built-in modules, 7 categories, state management |
-| Phase 3 — Plugin Ecosystem | 🔄 In Progress | `foundation add`, plugin sandbox, `project.lock`, 3 official plugins |
-| Phase 4 — Scale | 🗓 Planned | Blueprint system, `foundation eject`, AI suggestion mode (`--idea`), web GUI |
-
-### Phase 4 Targets
-- `foundation save-blueprint` / `foundation use-blueprint` — save and share project configurations
-- `foundation create --idea "AI CRM for gyms"` — AI-powered architecture suggestion
-- Monorepo output mode (Turborepo/Nx workspace)
-- Verified plugin program
-- Web configuration UI at foundation.build
+| Phase 0 — Skeleton | ✅ Done | Monorepo, TypeScript interfaces, FileTransaction, CI |
+| Phase 1 — Foundation Fixes | ✅ Done | ORMFieldType, build order, relation fields, ORM providers |
+| Phase 2 — Observability | ✅ Done | `foundation info`, `foundation doctor` |
+| Phase 3 — Dev Automation | ✅ Done | `foundation dev/db/test`, dependency-aware add, conflict detection, recommendations |
+| Phase 4 — Code Generators | ✅ Done | GeneratorService, `foundation generate model/crud`, `onGenerate` hook |
+| Phase 5 — ORM Extensions | ✅ Done | Relation fields (all 4 providers), SeederService |
+| Phase 6 — Ecosystem | ✅ Done | `foundation switch`, built-in module short-name resolution |
+| Phase 7 — AI Assistant | ✅ Done | `foundation ai` (opt-in, API key gated) |
 
 ---
 
