@@ -42,8 +42,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@systemlabs/foundation-plugin-sdk": "0.1.0",
-    "@systemlabs/foundation-core": "0.1.0"
+    "@systemlabs/foundation-plugin-sdk": "workspace:*",
+    "@systemlabs/foundation-core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

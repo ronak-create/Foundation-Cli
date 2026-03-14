@@ -87,7 +87,7 @@ export async function runCreateCommand(): Promise<void> {
       );
 
       const planSpinner = createStepSpinner("Building composition plan…");
-      plan = buildCompositionPlan(resolution.ordered, registry.orm);
+      plan = buildCompositionPlan(resolution.ordered);
       planSpinner.succeed(
         chalk.dim(
           `Composition plan ready  ` +

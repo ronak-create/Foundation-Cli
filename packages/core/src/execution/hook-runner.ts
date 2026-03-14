@@ -55,9 +55,11 @@ export type HookName =
 export interface HookRunnerOptions {
   /** If true, a failing hook throws HookExecutionError and halts the pipeline. */
   readonly strict?: boolean;
-  readonly onHookStart?:    ((moduleId: string, hookName: HookName) => void) | undefined;
+  readonly onHookStart?: ((moduleId: string, hookName: HookName) => void) | undefined;
   readonly onHookComplete?: ((moduleId: string, hookName: HookName) => void) | undefined;
-  readonly onHookSkipped?:  ((moduleId: string, hookName: HookName, reason: string) => void) | undefined;
+  readonly onHookSkipped?:
+    | ((moduleId: string, hookName: HookName, reason: string) => void)
+    | undefined;
   /** Sandbox execution timeout per hook in ms. Default: 5000. */
   readonly sandboxTimeoutMs?: number | undefined;
 }
@@ -212,11 +214,10 @@ async function runPluginHookSandboxed(
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function resolveHook(
-  plugin: PluginDefinition,
-  hookName: HookName,
-): ((ctx: PluginHookContext) => Promise<void>) | undefined {
-  return plugin.hooks?.[hookName];
+function resolveHook(plugin: PluginDefinition, hookName: HookName) {
+  return (plugin.hooks as Partial<Record<HookName, (ctx: PluginHookContext) => Promise<void>>>)?.[
+    hookName
+  ];
 }
 
 function resolveSandboxedHookSource(

@@ -41,9 +41,9 @@
     "test": "vitest run --reporter=verbose"
   },
   "dependencies": {
-    "@systemlabs/foundation-core": "0.1.0",
-    "@systemlabs/foundation-modules": "0.1.0",
-    "@systemlabs/foundation-plugin-sdk": "0.1.0",
+    "@systemlabs/foundation-core": "workspace:*",
+    "@systemlabs/foundation-modules": "workspace:*",
+    "@systemlabs/foundation-plugin-sdk": "workspace:*",
     "@inquirer/prompts": "^5.3.2",
     "chalk": "^5.3.0",
     "ora": "^8.1.0",

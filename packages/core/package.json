@@ -38,7 +38,7 @@
     "test": "vitest run --reporter=verbose"
   },
   "dependencies": {
-    "@systemlabs/foundation-plugin-sdk": "0.1.0",
+    "@systemlabs/foundation-plugin-sdk": "workspace:*",
     "ejs": "^3.1.10",
     "execa": "^9.3.0",
     "ajv": "^8.12.0",

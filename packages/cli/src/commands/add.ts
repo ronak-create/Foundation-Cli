@@ -248,13 +248,13 @@ export async function runAddCommand(
         plan = buildCompositionPlanWithOverrides(
           resolution.ordered,
           versionOverrides,
-          registry.orm,
+          // registry.orm,
         );
       } else {
         plan = buildCompositionPlanWithOverrides(
           resolution.ordered,
           new Map<string, string>(),
-          registry.orm,
+          // registry.orm,
         );
       }
     }
@@ -546,7 +546,7 @@ async function installBuiltinModule(
     const plan = buildCompositionPlanWithOverrides(
       resolution.ordered,
       new Map<string, string>(),
-      registry.orm,
+      // registry.orm,
     );
 
     composeSpinner.text = chalk.dim(

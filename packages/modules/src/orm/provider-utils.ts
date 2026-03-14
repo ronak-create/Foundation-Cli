@@ -16,7 +16,7 @@
  */
 
 import type { PluginHookContext } from "@systemlabs/foundation-plugin-sdk";
-import type { ORMService, ORMProvider } from "@systemlabs/foundation-core";
+import type { ORMProvider, ORMService } from "@systemlabs/foundation-core";
 
 /**
  * Attempts to extract the ORMService from `ctx.config.__registry`.
