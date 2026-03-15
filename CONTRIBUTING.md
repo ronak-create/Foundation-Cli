@@ -521,7 +521,7 @@ BREAKING CHANGE: ctx.config is now ctx.vars in all hook implementations.
 ## Release process
 
 Releases are managed by maintainers.
-```
+
 
 Release notes are published on the [GitHub Releases](https://github.com/ronak-create/Foundation-Cli/releases) page. Each release includes:
 - A summary of new features
