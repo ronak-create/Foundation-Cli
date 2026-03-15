@@ -1,7 +1,7 @@
 {
   "name": "@systemlabs/foundation-plugin-sdk",
   "description": "SDK for building custom plugins and modules for the Foundation ecosystem.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "MIT",
   "repository": {
     "type": "git",
