@@ -1,7 +1,7 @@
 {
   "name": "@systemlabs/foundation-testing",
   "description": "Testing utilities and helpers for Foundation modules and plugins.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -27,7 +27,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "tsup",
@@ -49,5 +50,8 @@
   },
   "peerDependencies": {
     "vitest": "^1.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

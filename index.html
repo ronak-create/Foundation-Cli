@@ -399,7 +399,7 @@
       <a href="#features" class="text-sm no-underline transition-colors duration-200" style="color:var(--muted);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Features</a>
       <a href="#demo" class="text-sm no-underline transition-colors duration-200" style="color:var(--muted);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Demo</a>
       <a href="#modules" class="text-sm no-underline transition-colors duration-200" style="color:var(--muted);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Modules</a>
-      <a href="#architecture" class="text-sm no-underline transition-colors duration-200" style="color:var(--muted);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Architecture</a>
+      <a href="#commands" class="text-sm no-underline transition-colors duration-200" style="color:var(--muted);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Commands</a>
     </div>
     <div class="hidden md:flex items-center gap-3">
       <a href="https://github.com/ronak-create/Foundation-Cli" target="_blank" class="btn-secondary" style="padding:0.5rem 1.1rem;font-size:0.82rem;">
@@ -417,7 +417,7 @@
     <a href="#features" class="text-sm no-underline" style="color:var(--muted);">Features</a>
     <a href="#demo" class="text-sm no-underline" style="color:var(--muted);">Demo</a>
     <a href="#modules" class="text-sm no-underline" style="color:var(--muted);">Modules</a>
-    <a href="#architecture" class="text-sm no-underline" style="color:var(--muted);">Architecture</a>
+    <a href="#commands" class="text-sm no-underline" style="color:var(--muted);">Commands</a>
     <a href="https://github.com/ronak-create/Foundation-Clim" target="_blank" class="btn-secondary" style="width:fit-content;font-size:0.82rem;">GitHub</a>
   </div>
 </nav>
@@ -553,10 +553,78 @@
       <div class="card reveal reveal-delay-3">
         <div class="icon-box" style="background:rgba(236,72,153,0.12);">🪝</div>
         <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Extensible Hooks</h3>
-        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">Lifecycle hooks let modules run custom logic before and after file writes — post-processing, validation, or dynamic config patching.</p>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">14 lifecycle hooks let modules run custom logic before and after file writes — post-processing, validation, or dynamic config patching.</p>
         <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
           <span class="module-tag">beforeWrite</span>
           <span class="module-tag">afterWrite</span>
+          <span class="module-tag">onFinalize</span>
+        </div>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="card reveal reveal-delay-1">
+        <div class="icon-box" style="background:rgba(99,102,241,0.12);">✨</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Code Generation</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">Generate ORM-aware models and full CRUD scaffolds interactively. Works across all four ORM providers with relation support.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">generate model</span>
+          <span class="module-tag">generate crud</span>
+        </div>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="card reveal reveal-delay-2">
+        <div class="icon-box" style="background:rgba(139,92,246,0.12);">🤖</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">AI Assistant</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">Describe your app in plain English. The CLI installs modules, generates models, and scaffolds CRUD automatically via Anthropic or OpenAI.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">Anthropic</span>
+          <span class="module-tag">OpenAI</span>
+        </div>
+      </div>
+
+      <!-- Card 9 -->
+      <div class="card reveal reveal-delay-3">
+        <div class="icon-box" style="background:rgba(6,182,212,0.12);">🔁</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Stack Switcher</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">Swap your ORM, backend, or database without touching config files. The CLI re-composes only affected files and updates the lockfile.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">switch orm</span>
+          <span class="module-tag">switch backend</span>
+        </div>
+      </div>
+
+      <!-- Card 10 -->
+      <div class="card reveal reveal-delay-1">
+        <div class="icon-box" style="background:rgba(16,185,129,0.12);">🩺</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Project Health</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">Run diagnostics on Node version, env vars, module compatibility, and ORM validity. Get a full project snapshot with one command.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">doctor</span>
+          <span class="module-tag">info</span>
+          <span class="module-tag">validate</span>
+        </div>
+      </div>
+
+      <!-- Card 11 -->
+      <div class="card reveal reveal-delay-2">
+        <div class="icon-box" style="background:rgba(245,158,11,0.12);">🗂️</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Project Archetypes</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">Start with battle-tested presets for SaaS, AI App, E-commerce, API Backend, and more — with all module defaults pre-selected.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">--preset saas</span>
+          <span class="module-tag">7 archetypes</span>
+        </div>
+      </div>
+
+      <!-- Card 12 -->
+      <div class="card reveal reveal-delay-3">
+        <div class="icon-box" style="background:rgba(236,72,153,0.12);">🔒</div>
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em;">Atomic File Writes</h3>
+        <p style="font-size:0.87rem;color:var(--muted);line-height:1.65;">All file operations are staged to a temp directory and committed atomically. Any failure rolls back completely — no partial scaffolds, ever.</p>
+        <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <span class="module-tag">stage → commit</span>
+          <span class="module-tag">rollback</span>
         </div>
       </div>
 
@@ -722,6 +790,20 @@
         </div>
       </div>
 
+      <!-- ORM -->
+      <div class="card reveal reveal-delay-1">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+          <div class="icon-box" style="background:rgba(6,182,212,0.12);margin-bottom:0;width:36px;height:36px;font-size:1rem;">🗂️</div>
+          <span style="font-size:0.82rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);">ORM</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;">
+          <span class="module-tag" style="justify-content:space-between;"><span>Prisma</span><span style="color:var(--accent);font-size:0.68rem;">popular</span></span>
+          <span class="module-tag">TypeORM</span>
+          <span class="module-tag">Mongoose</span>
+          <span class="module-tag">SQLAlchemy</span>
+        </div>
+      </div>
+
       <!-- Auth -->
       <div class="card reveal reveal-delay-4">
         <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
@@ -797,67 +879,106 @@
   </div>
 </section>
 
-<!-- ══════════════════ ARCHITECTURE ══════════════════ -->
-<section id="architecture" style="padding:5rem 0 7rem;background:linear-gradient(180deg,transparent,rgba(99,102,241,0.02),transparent);">
+<!-- ══════════════════ COMMANDS ══════════════════ -->
+<section id="commands" style="padding:5rem 0 7rem;background:linear-gradient(180deg,transparent,rgba(99,102,241,0.02),transparent);">
   <div class="max-w-5xl mx-auto px-6">
     <div class="text-center mb-16 reveal">
-      <div class="section-label">Under the Hood</div>
+      <div class="section-label">CLI Reference</div>
       <h2 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-0.025em;line-height:1.15;">
-        A pipeline built for<br/><span class="gradient-text">reliability</span>
+        Every command you<br/><span class="gradient-text">need, built in</span>
       </h2>
-      <p style="font-size:0.92rem;color:var(--muted);margin-top:0.75rem;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.7;">
-        Every project generation runs through a deterministic four-stage pipeline that guarantees reproducibility.
-      </p>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr;gap:1rem;max-width:680px;margin:0 auto;" class="reveal reveal-delay-1">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 reveal reveal-delay-1">
 
-      <div class="arch-node">
-        <div style="width:40px;height:40px;border-radius:10px;background:rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">📦</div>
-        <div style="flex:1;">
-          <div style="font-weight:700;font-size:0.95rem;letter-spacing:-0.01em;">Module Registry</div>
-          <div style="font-size:0.82rem;color:var(--muted);margin-top:0.2rem;">Loads, validates, and indexes all built-in and plugin modules. Manifest schema enforced via AJV.</div>
+      <!-- Project creation -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.1rem;">
+          <div class="icon-box" style="background:rgba(99,102,241,0.12);margin-bottom:0;width:34px;height:34px;font-size:0.95rem;">🏗️</div>
+          <span style="font-size:0.8rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);">Create</span>
         </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--accent);background:rgba(99,102,241,0.1);padding:0.2rem 0.5rem;border-radius:5px;flex-shrink:0;">01</div>
-      </div>
-
-      <div style="display:flex;justify-content:center;color:var(--muted);">
-        <svg width="16" height="24" viewBox="0 0 16 24" fill="none"><path d="M8 0v20M2 14l6 8 6-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-
-      <div class="arch-node">
-        <div style="width:40px;height:40px;border-radius:10px;background:rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">🔍</div>
-        <div style="flex:1;">
-          <div style="font-weight:700;font-size:0.95rem;letter-spacing:-0.01em;">Dependency Resolver</div>
-          <div style="font-size:0.82rem;color:var(--muted);margin-top:0.2rem;">Builds a DAG of selected modules, detects conflicts, resolves implicit requirements, and topologically sorts.</div>
+        <div style="display:flex;flex-direction:column;gap:0.55rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> create [name]</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> create my-app <span style="color:var(--muted);">--preset saas</span></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">npx</span> @systemlabs/foundation-cli</div>
         </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#a78bfa;background:rgba(139,92,246,0.1);padding:0.2rem 0.5rem;border-radius:5px;flex-shrink:0;">02</div>
       </div>
 
-      <div style="display:flex;justify-content:center;color:var(--muted);">
-        <svg width="16" height="24" viewBox="0 0 16 24" fill="none"><path d="M8 0v20M2 14l6 8 6-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-
-      <div class="arch-node">
-        <div style="width:40px;height:40px;border-radius:10px;background:rgba(6,182,212,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">🗺️</div>
-        <div style="flex:1;">
-          <div style="font-weight:700;font-size:0.95rem;letter-spacing:-0.01em;">Composition Planner</div>
-          <div style="font-size:0.82rem;color:var(--muted);margin-top:0.2rem;">Merges file trees, resolves config patches, and plans the final project structure before touching disk.</div>
+      <!-- Module management -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.1rem;">
+          <div class="icon-box" style="background:rgba(139,92,246,0.12);margin-bottom:0;width:34px;height:34px;font-size:0.95rem;">🔌</div>
+          <span style="font-size:0.8rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);">Modules</span>
         </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#67e8f9;background:rgba(6,182,212,0.1);padding:0.2rem 0.5rem;border-radius:5px;flex-shrink:0;">03</div>
-      </div>
-
-      <div style="display:flex;justify-content:center;color:var(--muted);">
-        <svg width="16" height="24" viewBox="0 0 16 24" fill="none"><path d="M8 0v20M2 14l6 8 6-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-
-      <div class="arch-node" style="border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.04);">
-        <div style="width:40px;height:40px;border-radius:10px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">⚡</div>
-        <div style="flex:1;">
-          <div style="font-weight:700;font-size:0.95rem;letter-spacing:-0.01em;">Execution Pipeline</div>
-          <div style="font-size:0.82rem;color:var(--muted);margin-top:0.2rem;">Renders templates, writes files atomically, runs lifecycle hooks, and installs npm/pip dependencies.</div>
+        <div style="display:flex;flex-direction:column;gap:0.55rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> add <span style="color:#86efac;">stripe</span></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> switch orm prisma</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> search <span style="color:var(--muted);">&lt;query&gt;</span></div>
         </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#34d399;background:rgba(16,185,129,0.1);padding:0.2rem 0.5rem;border-radius:5px;flex-shrink:0;">04</div>
+      </div>
+
+      <!-- Code generation -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.1rem;">
+          <div class="icon-box" style="background:rgba(6,182,212,0.12);margin-bottom:0;width:34px;height:34px;font-size:0.95rem;">✨</div>
+          <span style="font-size:0.8rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);">Generate</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.55rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> generate model Post</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> generate crud Post</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> generate <span style="color:var(--muted);">--list</span></div>
+        </div>
+      </div>
+
+      <!-- Dev automation -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.1rem;">
+          <div class="icon-box" style="background:rgba(16,185,129,0.12);margin-bottom:0;width:34px;height:34px;font-size:0.95rem;">⚡</div>
+          <span style="font-size:0.8rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);">Dev Automation</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.55rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> dev</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> test</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> upgrade <span style="color:var(--muted);">--dry-run</span></div>
+        </div>
+      </div>
+
+      <!-- Database -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.1rem;">
+          <div class="icon-box" style="background:rgba(6,182,212,0.12);margin-bottom:0;width:34px;height:34px;font-size:0.95rem;">🗄️</div>
+          <span style="font-size:0.8rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);">Database</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.55rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> db migrate</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> db seed <span style="color:var(--muted);">/ reset / studio</span></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> db push</div>
+        </div>
+      </div>
+
+      <!-- Project inspection + tooling -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.1rem;">
+          <div class="icon-box" style="background:rgba(245,158,11,0.12);margin-bottom:0;width:34px;height:34px;font-size:0.95rem;">🩺</div>
+          <span style="font-size:0.8rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);">Inspect &amp; Tooling</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.55rem;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> info <span style="color:var(--muted);">/ doctor / validate</span></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> eject <span style="color:var(--muted);">[module-id]</span></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.45rem 0.85rem;"><span style="color:var(--accent);">foundation</span> create-plugin <span style="color:var(--muted);">[name]</span></div>
+        </div>
+      </div>
+
+      <!-- AI assistant - full width -->
+      <div class="card md:col-span-2" style="border-color:rgba(139,92,246,0.25);background:linear-gradient(135deg,rgba(99,102,241,0.05),rgba(139,92,246,0.05));">
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.1rem;">
+          <div class="icon-box" style="background:rgba(139,92,246,0.15);margin-bottom:0;width:34px;height:34px;font-size:0.95rem;">🤖</div>
+          <span style="font-size:0.8rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);">AI Assistant</span>
+          <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--accent2);background:rgba(139,92,246,0.12);padding:0.15rem 0.5rem;border-radius:5px;">requires API key</span>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:7px;padding:0.55rem 0.85rem;">
+          <span style="color:var(--accent);">foundation</span> ai <span style="color:#86efac;">"create a blog system with posts, comments, and JWT auth"</span>
+        </div>
       </div>
 
     </div>

@@ -1,7 +1,7 @@
 {
   "name": "@systemlabs/foundation-plugin-sdk",
   "description": "SDK for building custom plugins and modules for the Foundation ecosystem.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -27,7 +27,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "tsup",
@@ -46,5 +47,8 @@
   "dependencies": {
     "ajv": "^8.12.0",
     "ajv-formats": "^3.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

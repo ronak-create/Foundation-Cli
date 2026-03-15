@@ -1,7 +1,7 @@
 {
   "name": "@systemlabs/foundation-modules",
   "description": "Built-in modules for databases, backends, auth providers, and services.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -15,7 +15,7 @@
     "cli",
     "scaffolding",
     "foundation"
-  ],  
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -31,7 +31,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "tsup",
@@ -50,5 +51,8 @@
     "tsup": "^8.0.0",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
