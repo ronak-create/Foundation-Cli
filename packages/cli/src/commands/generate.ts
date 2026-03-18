@@ -33,6 +33,7 @@ import {
   resolveModules,
   buildCompositionPlan,
   runHooksForPlan,
+  makeRegistryAccessor,
   type ORMService,
   type ORMFieldDefinition,
   type ORMFieldType,
@@ -93,20 +94,27 @@ export async function runGenerateCommand(args: ReadonlyArray<string>): Promise<v
   loadBuiltinModules(registry);
   await registerInstalledPlugins(cwd, registry);
 
-  // Fire onRegister hooks so ORM providers register themselves with registry.orm.
-  // Without this, registry.orm.buildSchemaFiles() always returns [] because
-  // no provider has called registerProvider() yet.
+  // Fire onRegister hooks for ORM-category modules ONLY so providers register
+  // themselves with registry.orm before we call buildSchemaFiles().
+  // Limiting to ORM modules prevents non-idempotent hooks on other modules
+  // from firing twice (they already ran during scaffold time).
   const { lockfile, config } = await readProjectState(cwd);
-  const installedIds = (lockfile?.modules ?? [])
+  const allInstalledIds = (lockfile?.modules ?? [])
     .map(m => m.id)
     .filter(id => registry.hasModule(id));
-  if (installedIds.length > 0) {
-    const resolution = resolveModules(installedIds, registry);
-    const plan       = buildCompositionPlan(resolution.ordered);
+
+  const ormIds = allInstalledIds.filter(id => {
+    try { return registry.getModule(id).manifest.category === "orm"; }
+    catch { return false; }
+  });
+
+  if (ormIds.length > 0) {
+    const resolution = resolveModules(ormIds, registry);
+    const plan = buildCompositionPlan(resolution.ordered);
     await runHooksForPlan("onRegister", plan, registry, {
-      projectRoot:     cwd,
-      config:          { __registry: registry },
-      selectedModules: installedIds,
+      projectRoot: cwd,
+      config: Object.freeze({ __registry: makeRegistryAccessor(registry) }),
+      selectedModules: ormIds,
     }, { strict: false });
   }
 
@@ -373,7 +381,25 @@ function generateCrudFiles(
   backend: Backend,
 ): Array<{ relativePath: string; content: string; overwrite: boolean }> {
   const lower = modelName.toLowerCase();
-  const vars = { modelName, lower, fields };
+  // tsType and pyType are injected into the EJS template scope as callable
+  // functions. Previously they were defined inside template strings (rendered
+  // into output files), which meant EJS called undefined variables at render
+  // time — ReferenceError at runtime.
+  const tsType = (t: string): string => {
+    const map: Record<string, string> = {
+      string: "string", number: "number", boolean: "boolean",
+      date: "Date", uuid: "string", json: "Record<string, unknown>",
+    };
+    return map[t] ?? "unknown";
+  };
+  const pyType = (t: string): string => {
+    const map: Record<string, string> = {
+      string: "str", number: "float", boolean: "bool",
+      date: "datetime", uuid: "str", json: "dict",
+    };
+    return map[t] ?? "str";
+  };
+  const vars = { modelName, lower, fields, tsType, pyType };
 
   if (backend === "fastapi" || backend === "django") {
     return generatePythonCrud(modelName, lower, fields);
@@ -409,7 +435,21 @@ function generatePythonCrud(
   lower: string,
   fields: ORMFieldDefinition[],
 ): Array<{ relativePath: string; content: string; overwrite: boolean }> {
-  const vars = { modelName, lower, fields };
+  const tsType = (t: string): string => {
+    const map: Record<string, string> = {
+      string: "string", number: "number", boolean: "boolean",
+      date: "Date", uuid: "string", json: "Record<string, unknown>",
+    };
+    return map[t] ?? "unknown";
+  };
+  const pyType = (t: string): string => {
+    const map: Record<string, string> = {
+      string: "str", number: "float", boolean: "bool",
+      date: "datetime", uuid: "str", json: "dict",
+    };
+    return map[t] ?? "str";
+  };
+  const vars = { modelName, lower, fields, tsType, pyType };
   return [
     {
       relativePath: `src/routers/${lower}.py`,
@@ -535,13 +575,6 @@ export const <%= lower %>Service = {
   },
 };
 
-function tsType(t: string): string {
-  const map: Record<string, string> = {
-    string: "string", number: "number", boolean: "boolean",
-    date: "Date", uuid: "string", json: "Record<string, unknown>",
-  };
-  return map[t] ?? "unknown";
-}
 `;
 
 const CONTROLLER_TEMPLATE_EXPRESS = `// <%= modelName %> controller — Express
@@ -714,8 +747,4 @@ class <%= modelName %>Response(<%= modelName %>Base):
     class Config:
         from_attributes = True
 
-
-def pyType(t: str) -> str:
-    return {"string": "str", "number": "float", "boolean": "bool",
-            "date": "datetime", "uuid": "str", "json": "dict"}.get(t, "str")
 `;

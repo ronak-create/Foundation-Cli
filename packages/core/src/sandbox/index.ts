@@ -5,7 +5,6 @@ export {
   SandboxBlockedModuleError,
   SandboxTimeoutError,
   BLOCKED_MODULES,
-  type SandboxLogger,
   type SandboxHookOptions,
 } from "./plugin-sandbox.js";
 

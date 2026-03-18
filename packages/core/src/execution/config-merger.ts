@@ -10,7 +10,7 @@ import yaml from "js-yaml";
 import { FoundationError } from "../errors.js";
 import { safeResolve } from "../path-utils.js";
 import type { ConfigPatch } from "@systemlabs/foundation-plugin-sdk";
-import { mergeRequirements, RequirementsMergeError } from "../file-merger/requiremenets-merge.js";
+import { mergeRequirements, RequirementsMergeError } from "../file-merger/requirements-merge.js";
 
 // ── Errors ────────────────────────────────────────────────────────────────────
 

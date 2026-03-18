@@ -38,6 +38,9 @@ export interface RawSelections {
   readonly ui: string;
   readonly stateManagement: string;
   readonly deployment: string;
+  // Index signature so RawSelections satisfies Record<string, string> —
+  // required by buildCompositionPlan's selections parameter.
+  readonly [key: string]: string;
 }
 
 /**
@@ -205,7 +208,7 @@ export async function runPromptFlow(
 
     const map: Record<string, string> = SELECTION_TO_MODULE_ID as Record<string, string>;
 
-    for (const selectionValue of Object.values(rawSelections) as string[]) {
+    for (const selectionValue of Object.values(rawSelections)) {
       if (!selectionValue || selectionValue === "none") continue;
 
       const moduleId: string = Object.prototype.hasOwnProperty.call(map, selectionValue)
@@ -379,4 +382,3 @@ function withSectionHeaders(base: typeof inquirerAdapter): typeof inquirerAdapte
     },
   };
 }
-

@@ -11,6 +11,54 @@ import { GeneratorService } from "../generator/generator-service.js";
 
 export type ModuleSource = "builtin" | "plugin";
 
+/**
+ * RegistryAccessor — the restricted registry surface exposed to plugin hooks
+ * via ctx.config.__registry.
+ *
+ * Only ORM/generator mutation methods are exposed. Hooks cannot call
+ * registerModule / registerPlugin or read the raw entry map.
+ */
+export interface RegistryAccessor {
+  readonly orm: {
+    registerProvider: ORMService["registerProvider"];
+    registerModel: ORMService["registerModel"];
+    registerSeed: ORMService["registerSeed"];
+    buildSchemaFiles: ORMService["buildSchemaFiles"];
+    getProvider: ORMService["getProvider"];
+    hasProvider: ORMService["hasProvider"];
+    getModels: ORMService["getModels"];
+  };
+  readonly generators: {
+    register: GeneratorService["register"];
+    list: GeneratorService["list"];
+  };
+  readonly hasModule: (id: string) => boolean;
+}
+
+/**
+ * Creates a RegistryAccessor from a live ModuleRegistry.
+ * Exposes only the ORM/generator surface — hooks cannot register modules
+ * or access full registry internals.
+ */
+export function makeRegistryAccessor(registry: ModuleRegistry): RegistryAccessor {
+  return {
+    orm: {
+      registerProvider: registry.orm.registerProvider.bind(registry.orm),
+      registerModel: registry.orm.registerModel.bind(registry.orm),
+      registerSeed: registry.orm.registerSeed.bind(registry.orm),
+      buildSchemaFiles: registry.orm.buildSchemaFiles.bind(registry.orm),
+      getProvider: registry.orm.getProvider.bind(registry.orm),
+      hasProvider: registry.orm.hasProvider.bind(registry.orm),
+      getModels: registry.orm.getModels.bind(registry.orm),
+    },
+    generators: {
+      register: registry.generators.register.bind(registry.generators),
+      list: registry.generators.list.bind(registry.generators),
+    },
+    hasModule: registry.hasModule.bind(registry),
+  };
+}
+
 interface RegistryEntry {
   readonly plugin: PluginDefinition;
   readonly source: ModuleSource;

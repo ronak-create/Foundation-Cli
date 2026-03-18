@@ -1,9 +1,9 @@
-import { execaCommand } from "execa";
+import { execa } from "execa";
 import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
-import { FoundationError } from "../errors.js";
+import { FoundationError, PathTraversalError } from "../errors.js";
 // import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 
 // ── Errors ────────────────────────────────────────────────────────────────────
@@ -86,8 +86,10 @@ export async function fetchPlugin(
 
   try {
     // `npm pack` downloads the tarball into tempDir and prints the filename.
-    const { stdout } = await execaCommand(
-      `npm pack ${packageSpec} --pack-destination ${tempDir} --json`,
+    // Array-args form: packageSpec is never shell-parsed — no injection possible.
+    const { stdout } = await execa(
+      "npm",
+      ["pack", packageSpec, "--pack-destination", tempDir, "--json"],
       { reject: true },
     );
 
@@ -108,10 +110,8 @@ export async function fetchPlugin(
     const extractDir = path.join(tempDir, "pkg");
     await fs.mkdir(extractDir, { recursive: true });
 
-    // Extract tarball
-    await execaCommand(`tar -xzf ${tarballPath} -C ${extractDir}`, {
-      reject: true,
-    });
+    // Extract tarball — array-args, no shell parsing.
+    await execa("tar", ["-xzf", tarballPath, "-C", extractDir], { reject: true });
 
     // npm packs into a "package/" subdirectory
     const pkgRoot = path.join(extractDir, "package");
@@ -162,8 +162,20 @@ export async function fetchPlugin(
  * Reads a plugin from a local directory (for testing / local development).
  * Expects the same structure: manifest.json + package.json at the root.
  */
-export async function fetchPluginFromDirectory(localDir: string): Promise<FetchedPlugin> {
+export async function fetchPluginFromDirectory(
+  localDir: string,
+  permittedRoot?: string,
+): Promise<FetchedPlugin> {
   const absDir = path.resolve(localDir);
+
+  // Traversal guard: local plugin paths must be within the permitted root.
+  // When called from installPlugin, the permitted root is the project root.
+  // This prevents `file:../../../etc` paths from reading arbitrary files.
+  const root = path.resolve(permittedRoot ?? process.cwd());
+  const rootWithSep = root.endsWith(path.sep) ? root : root + path.sep;
+  if (absDir !== root && !absDir.startsWith(rootWithSep)) {
+    throw new PathTraversalError(localDir);
+  }
   const pkgJsonPath = path.join(absDir, "package.json");
   const manifestPath = path.join(absDir, "manifest.json");
 
@@ -208,4 +220,3 @@ export async function cleanupFetchTemp(tempDir: string): Promise<void> {
     // best-effort
   }
 }
-

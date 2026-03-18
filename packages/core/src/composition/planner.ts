@@ -83,11 +83,35 @@ export function detectDependencyConflicts(
  *                        When supplied and a provider + models are registered,
  *                        generated schema files are merged into the plan.
  */
+// ── FileEntry.when evaluator ──────────────────────────────────────────────────
+
+/**
+ * Evaluates a FileEntry.when condition string against the user's selection map.
+ *
+ * Format: "<category>.<value>"   e.g. "deployment.docker", "frontend.nextjs"
+ * Special values: undefined / "always" → always include.
+ *
+ * A malformed condition (no dot separator) is treated as always-include to
+ * avoid silently dropping files from misconfigured manifests.
+ */
+function evaluateWhen(
+  when: string | undefined,
+  selections: Readonly<Record<string, string>>,
+): boolean {
+  if (when === undefined || when === "always") return true;
+  const dotIdx = when.indexOf(".");
+  if (dotIdx === -1) return true; // malformed — include by default
+  const category = when.slice(0, dotIdx);
+  const expected = when.slice(dotIdx + 1);
+  return selections[category] === expected;
+}
+
 export function buildCompositionPlan(
   orderedModules: ReadonlyArray<ModuleManifest>,
   orm?: ORMService,
+  selections: Readonly<Record<string, string>> = {},
 ): CompositionPlan {
-  return buildCompositionPlanWithOverrides(orderedModules, new Map(), orm);
+  return buildCompositionPlanWithOverrides(orderedModules, new Map(), orm, selections);
 }
 
 // ── buildCompositionPlanWithOverrides ─────────────────────────────────────────
@@ -111,6 +135,7 @@ export function buildCompositionPlanWithOverrides(
   orderedModules: ReadonlyArray<ModuleManifest>,
   versionOverrides: ReadonlyMap<string, string>,
   orm?: ORMService,
+  selections: Readonly<Record<string, string>> = {},
 ): CompositionPlan {
   const fileMap = new Map<string, { entry: FileEntry; sourceModuleId: string }>();
   const depMap  = new Map<string, { dep: PackageDependency; sourceModuleId: string }>();
@@ -119,6 +144,12 @@ export function buildCompositionPlanWithOverrides(
   for (const manifest of orderedModules) {
     // ── Files ────────────────────────────────────────────────────────────────
     for (const fileEntry of manifest.files ?? []) {
+      // Evaluate the optional `when` condition. A file with a condition that
+      // does not match the current selections is excluded from the plan.
+      // Example: { when: "deployment.docker" } only writes a Dockerfile when
+      // the user selected Docker as their deployment target.
+      if (!evaluateWhen(fileEntry.when, selections)) continue;
+
       const existing = fileMap.get(fileEntry.relativePath);
       if (existing !== undefined) {
         if (fileEntry.overwrite === true) {

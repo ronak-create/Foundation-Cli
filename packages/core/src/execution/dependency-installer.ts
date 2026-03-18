@@ -158,10 +158,13 @@ export interface PythonInstallResult {
 }
 
 /**
- * Merges Python package specs into requirements.txt and runs `pip install -r`.
+ * Merges Python package specs into requirements.txt, creates a .venv if needed,
+ * then runs pip install inside the venv.
  *
- * Deduplicates by package name (later entry wins). Skips the actual
- * `pip install` call in dryRun mode.
+ * WHY venv:
+ *   Python 3.11+ enforces "externally-managed-environment" — bare `pip install`
+ *   into the system Python fails with PEP 668. A per-project venv is the
+ *   correct isolation strategy and matches what developers expect.
  */
 export async function installPythonDependencies(
   options: PythonInstallOptions,
@@ -175,7 +178,8 @@ export async function installPythonDependencies(
 
   onProgress?.({ stage: "writing-package-json", message: "Writing requirements.txt…" });
 
-  const reqPath = path.join(path.resolve(targetDir), "requirements.txt");
+  const resolvedDir = path.resolve(targetDir);
+  const reqPath = path.join(resolvedDir, "requirements.txt");
   let existing = "";
   try {
     existing = await fs.readFile(reqPath, "utf-8");
@@ -203,27 +207,40 @@ export async function installPythonDependencies(
     return { installed: packages, duration: Date.now() - start };
   }
 
-  onProgress?.({ stage: "installing", message: "Running pip install -r requirements.txt…" });
+  // ── Create .venv if it does not already exist ────────────────────────────
+  const venvDir = path.join(resolvedDir, ".venv");
+  const venvExists = await fs.access(venvDir).then(() => true).catch(() => false);
 
-  try {
-    await execa("pip", ["install", "-r", "requirements.txt"], {
-      cwd: path.resolve(targetDir),
-      reject: true,
-    });
-  } catch {
-    // Retry with pip3
+  if (!venvExists) {
+    onProgress?.({ stage: "installing", message: "Creating Python virtual environment (.venv)…" });
     try {
-      await execa("pip3", ["install", "-r", "requirements.txt"], {
-        cwd: path.resolve(targetDir),
-        reject: true,
-      });
-    } catch (err) {
-      throw new DependencyInstallError("pip", packages, err);
+      await execa("python3", ["-m", "venv", venvDir], { cwd: resolvedDir, reject: true });
+    } catch {
+      // Some systems only have `python` on PATH
+      await execa("python", ["-m", "venv", venvDir], { cwd: resolvedDir, reject: true });
     }
   }
 
+  // ── Resolve venv pip binary (cross-platform) ─────────────────────────────
+  const isWindows = process.platform === "win32";
+  const venvPip = path.join(venvDir, isWindows ? "Scripts\\pip.exe" : "bin/pip");
+
+  onProgress?.({ stage: "installing", message: "Installing Python packages into .venv…" });
+
+  try {
+    await execa(venvPip, ["install", "-r", "requirements.txt"], {
+      cwd: resolvedDir,
+      reject: true,
+    });
+  } catch (err) {
+    throw new DependencyInstallError("pip", packages, err);
+  }
+
   const duration = Date.now() - start;
-  onProgress?.({ stage: "done", message: `Installed ${packages.length} Python package(s) in ${(duration / 1000).toFixed(1)}s` });
+  onProgress?.({
+    stage: "done",
+    message: `Installed ${packages.length} Python package(s) via .venv in ${(duration / 1000).toFixed(1)}s`,
+  });
 
   return { installed: packages, duration };
 }
@@ -302,4 +319,3 @@ export async function installDependencies(
     duration,
   };
 }
-

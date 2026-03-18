@@ -18,7 +18,21 @@ import type { ModuleManifest } from "@systemlabs/foundation-plugin-sdk";
 export const FOUNDATION_DIR = ".foundation";
 export const LOCKFILE_NAME = "project.lock";
 export const CONFIG_NAME = "foundation.config.json";
-export const FOUNDATION_CLI_VERSION = "0.0.1";
+/**
+ * The actual installed CLI version, read from this package's package.json.
+ * Falls back to "0.0.0-unknown" if the file cannot be read (e.g., in tests
+ * where the package root is not on disk).
+ */
+export const FOUNDATION_CLI_VERSION: string = await (async (): Promise<string> => {
+  try {
+    const { readFile } = await import("node:fs/promises");
+    const pkgUrl = new URL("../../package.json", import.meta.url);
+    const pkg = JSON.parse(await readFile(pkgUrl, "utf-8")) as { version?: string };
+    return typeof pkg.version === "string" ? pkg.version : "0.0.0-unknown";
+  } catch {
+    return "0.0.0-unknown";
+  }
+})();
 
 export { StateWriteError, StateReadError };
 
@@ -271,4 +285,3 @@ async function readFileSafe(filePath: string): Promise<string | null> {
     throw new StateReadError(filePath, err);
   }
 }
-

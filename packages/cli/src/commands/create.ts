@@ -6,6 +6,8 @@ import {
   buildCompositionPlan,
   runExecutionPipeline,
   renderAllTemplates,
+  runHooksForPlan,
+  makeRegistryAccessor,
   type PipelineEvent,
 } from "@systemlabs/foundation-core";
 import {
@@ -86,8 +88,30 @@ export async function runCreateCommand(): Promise<void> {
             : ""),
       );
 
+      // Bootstrap ORM onRegister hooks before building the plan so that
+      // ORM providers call registerProvider() before buildCompositionPlan
+      // calls orm.buildSchemaFiles(). Without this, schema files are always
+      // empty in scaffolded projects (Issue 18 fix).
+      const ormIds = resolution.ordered
+        .filter(m => m.category === "orm")
+        .map(m => m.id);
+
+      if (ormIds.length > 0) {
+        const ormResolution = resolveModules(ormIds, registry);
+        const ormBootstrapPlan = buildCompositionPlan(ormResolution.ordered);
+        await runHooksForPlan("onRegister", ormBootstrapPlan, registry, {
+          projectRoot: path.resolve(process.cwd(), selection.projectName),
+          config: Object.freeze({ __registry: makeRegistryAccessor(registry) }),
+          selectedModules: ormIds,
+        }, { strict: false });
+      }
+
       const planSpinner = createStepSpinner("Building composition plan…");
-      plan = buildCompositionPlan(resolution.ordered);
+      plan = buildCompositionPlan(
+        resolution.ordered,
+        registry.orm,
+        selection.rawSelections,
+      );
       planSpinner.succeed(
         chalk.dim(
           `Composition plan ready  ` +

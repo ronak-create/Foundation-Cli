@@ -23,7 +23,7 @@ npm install @systemlabs/foundation-core
 | **FileTransaction** | Atomic file operations — all writes are staged to a temp directory; on any failure the temp dir is deleted and the output directory is left untouched |
 | **Template Engine** | EJS-based renderer; modules supply `.ejs` template files that are rendered with per-module context variables |
 | **Plugin Installer** | Fetches third-party plugins from npm, validates their manifest, and registers them into the module registry |
-| **Sandbox** | Executes third-party plugin hooks in an isolated context |
+| **Sandbox** | Executes third-party plugin hooks in an isolated `worker_threads` Worker — no shared V8 realm with the parent process |
 | **State / Lockfile** | Reads and writes `.foundation/project.lock` and `.foundation/foundation.config.json` |
 
 ---
@@ -133,6 +133,8 @@ onRegister → onBeforeCompose → onAfterTemplate → onMerge →
 onAfterCompose → beforeWrite → [FileTransaction.commit()] →
 afterWrite → beforeInstall → [npm/pip install] → afterInstall →
 onFinalize
+
+On failure: onRollback (errors swallowed, original error re-thrown)
 ```
 
 On failure: `onRollback` is called for each registered module in reverse order.

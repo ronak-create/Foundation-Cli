@@ -122,7 +122,7 @@ export async function installPlugin(
   let fetched: FetchedPlugin;
   try {
     fetched = isLocalPath
-      ? await fetchPluginFromDirectory(packageName)
+      ? await fetchPluginFromDirectory(packageName, projectRoot)
       : await fetchPlugin(packageName, version);
   } catch (err) {
     if (err instanceof FoundationError) throw err;
@@ -343,4 +343,3 @@ export async function registerInstalledPlugins(
 
   return registered;
 }
-

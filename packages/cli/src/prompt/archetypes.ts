@@ -44,28 +44,33 @@ export const ARCHETYPES: Readonly<Record<string, ArchetypePreset>> = {
 
   "ai-app": {
     name: "AI Application",
-    description: "Next.js frontend with an Express API layer for LLM integrations",
+    description: "Next.js + Express with TanStack Query for streaming responses and server state",
     defaults: {
       frontend: "nextjs",
       backend: "express",
       database: "postgresql",
       auth: "jwt",
       ui: "tailwind",
-      stateManagement: "none",
+      // TanStack Query handles streaming LLM responses and server-state caching
+      stateManagement: "tanstack-query",
       deployment: "docker",
     },
   },
 
   ecommerce: {
     name: "E-commerce",
-    description: "Storefront with PostgreSQL product catalogue and JWT auth",
+    description: "Next.js storefront with session auth for cart state and ShadCN UI",
     defaults: {
       frontend: "nextjs",
       backend: "express",
       database: "postgresql",
-      auth: "jwt",
-      ui: "tailwind",
-      stateManagement: "none",
+      // Session auth maintains cart state across requests — JWT is stateless
+      // and poorly suited for cart/checkout flows
+      auth: "session",
+      // ShadCN provides the product cards, modals, and checkout UI primitives
+      ui: "shadcn",
+      // Zustand manages client-side cart and wishlist state
+      stateManagement: "zustand",
       deployment: "docker",
     },
   },
@@ -100,29 +105,36 @@ export const ARCHETYPES: Readonly<Record<string, ArchetypePreset>> = {
 
   crm: {
     name: "CRM",
-    description: "Customer relationship management with full stack and auth",
+    description: "NestJS + Next.js with OAuth SSO, MUI data grids, and Redux entity state",
     defaults: {
       frontend: "nextjs",
-      backend: "express",
+      // NestJS DI/module structure suits CRM domain complexity
+      backend: "nestjs",
       database: "postgresql",
-      auth: "jwt",
-      ui: "tailwind",
-      stateManagement: "none",
+      // CRMs require enterprise SSO — OAuth not stateless JWT
+      auth: "oauth",
+      // MUI DataGrid is the industry standard for CRM table views
+      ui: "mui",
+      // Redux handles normalised contact/deal/pipeline entity state
+      stateManagement: "redux",
       deployment: "docker",
     },
   },
 
   dashboard: {
     name: "Full-stack Dashboard",
-    description: "Data-rich dashboard with Next.js, Express, and PostgreSQL",
+    description: "Analytics dashboard with TanStack Query, ShadCN charts, and Vercel deployment",
     defaults: {
       frontend: "nextjs",
       backend: "express",
       database: "postgresql",
       auth: "jwt",
-      ui: "tailwind",
-      stateManagement: "none",
-      deployment: "docker",
+      // ShadCN provides the chart primitives and card components dashboards need
+      ui: "shadcn",
+      // Dashboards are query-heavy — TanStack Query handles caching + refetch
+      stateManagement: "tanstack-query",
+      // Dashboards are typically frontend-heavy and deploy well to Vercel
+      deployment: "vercel",
     },
   },
 

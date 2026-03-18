@@ -84,16 +84,35 @@ export function parseLockfile(raw: string): ProjectLockfile | null {
       foundationCliVersion: parsed.foundationCliVersion,
       generatedAt: parsed.generatedAt,
       packageManager: parsed.packageManager,
-      modules: (parsed.modules as LockfileModuleEntry[]).map((m) => ({
-        id: m.id,
-        version: m.version,
-      })),
+      modules: (parsed.modules as unknown[]).flatMap((m): LockfileModuleEntry[] => {
+        if (
+          typeof m !== "object" || m === null ||
+          typeof (m as Record<string, unknown>)["id"] !== "string" ||
+          typeof (m as Record<string, unknown>)["version"] !== "string"
+        ) {
+          return []; // skip malformed entries silently
+        }
+        return [{
+          id: (m as LockfileModuleEntry).id,
+          version: (m as LockfileModuleEntry).version,
+        }];
+      }),
       plugins: Array.isArray(parsed.plugins)
-        ? (parsed.plugins as LockfilePluginEntry[]).map((p) => ({
-            id: p.id,
-            version: p.version,
-            source: p.source,
-          }))
+        ? (parsed.plugins as unknown[]).flatMap((p): LockfilePluginEntry[] => {
+            if (
+              typeof p !== "object" || p === null ||
+              typeof (p as Record<string, unknown>)["id"] !== "string" ||
+              typeof (p as Record<string, unknown>)["version"] !== "string" ||
+              typeof (p as Record<string, unknown>)["source"] !== "string"
+            ) {
+              return [];
+            }
+            return [{
+              id: (p as LockfilePluginEntry).id,
+              version: (p as LockfilePluginEntry).version,
+              source: (p as LockfilePluginEntry).source,
+            }];
+          })
         : [],
     };
   } catch {

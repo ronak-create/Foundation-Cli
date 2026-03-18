@@ -447,10 +447,11 @@ foundation add stripe
 ```
 | File | Description |
 |------|-------------|
-| `src/lib/stripe.ts` | `Stripe` client singleton |
-| `src/webhooks/stripe.router.ts` | Webhook handler with signature verification |
+| `src/payments/stripe.ts` | `Stripe` client singleton with env-key guard |
+| `src/payments/stripe-webhooks.ts` | Express webhook handler with signature verification and event routing |
+| `src/payments/stripe-types.ts` | Type re-exports (`StripeWebhookEvent`, `StripeEventType`) |
 
-Env vars added: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+Env vars added: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
 
 ---
 

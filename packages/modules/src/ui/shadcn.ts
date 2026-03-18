@@ -144,7 +144,7 @@ export const shadcnModule: PluginDefinition = {
     ],
     files: [
       { relativePath: "tailwind.config.ts", content: TAILWIND_CONFIG },
-      { relativePath: "src/app/globals.css", content: GLOBALS_CSS },
+      { relativePath: "src/app/globals.css", content: GLOBALS_CSS, overwrite: true },
       { relativePath: "src/lib/utils.ts", content: UTILS_TS },
       { relativePath: "components.json", content: COMPONENTS_JSON },
     ],

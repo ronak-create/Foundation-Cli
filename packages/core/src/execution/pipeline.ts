@@ -7,7 +7,10 @@
 //   4. postInstallInstructions printed from each module manifest after success
 
 import type { CompositionPlan } from "../types.js";
-import type { ModuleRegistry } from "../module-registry/registry.js";
+import {
+  type ModuleRegistry,
+  makeRegistryAccessor,
+} from "../module-registry/registry.js";
 import type { PluginHookContext } from "@systemlabs/foundation-plugin-sdk";
 import { executeCompositionPlan } from "./project-writer.js";
 import { applyAllPatches } from "./config-merger.js";
@@ -125,14 +128,14 @@ export async function runExecutionPipeline(
   const baseCtx: PluginHookContext = {
     ...options.hookContext,
     projectRoot: targetDir,
-    // Thread the registry through config so ORM modules can call
-    // registry.orm.registerProvider() / registerModel() in onRegister hooks.
-    // The key "__registry" is a private convention; module hooks cast via
-    // (ctx.config as Record<string, unknown>)["__registry"].
-    config: {
+    // Expose a narrowed RegistryAccessor so hooks can call
+    // registry.orm.registerProvider() but cannot call registerModule()
+    // or access full registry internals. config is Object.frozen so
+    // builtin hooks cannot accidentally mutate it.
+    config: Object.freeze({
       ...options.hookContext.config,
-      __registry: registry,
-    },
+      __registry: makeRegistryAccessor(registry),
+    }),
   };
 
   const hookOpts = {

@@ -359,7 +359,7 @@ This scaffolds:
 ```
 foundation-plugin-my-plugin/
 ├── manifest.json     ← validated against ModuleManifest schema
-├── hooks.mjs         ← lifecycle hooks (sandboxed execution)
+├── hooks.mjs         ← lifecycle hooks (executed in isolated worker_threads Worker)
 ├── files/            ← EJS template files
 ├── patches/          ← config patch files
 └── package.json      ← must include 'foundation-plugin' keyword

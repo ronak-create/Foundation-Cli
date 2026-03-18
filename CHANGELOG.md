@@ -29,6 +29,50 @@ Versions follow [Semantic Versioning](https://semver.org/).
  
 ---
 
+## [0.3.0] — 2026-03-18
+
+### Security
+
+- **Plugin sandbox replaced** — `vm.Script` execution swapped for `worker_threads` Worker isolation. Eliminates the `Promise.constructor.constructor("return process")()` escape path; worker context is physically separate from the parent V8 realm.
+- **Shell injection closed** — `execaCommand` string interpolation in `npm-fetcher` replaced with `execa` array-args; user-supplied plugin names/versions are never shell-parsed.
+- **Path traversal guard** — `fetchPluginFromDirectory` now validates `file:` plugin paths are within the project root before opening any file.
+- **EJS output encoding** — Identity escape function injected into `renderTemplate`; generated `.ts`/`.py` files no longer HTML-encode apostrophes (`o'reilly` → was `o&#39;reilly`).
+- **Hook context hardened** — `ctx.config.__registry` now exposes a `RegistryAccessor` (ORM/generator surface only) instead of the raw `ModuleRegistry`. `ctx.config` is `Object.freeze`d.
+
+### Fixed
+
+- **ORM schema files now appear in scaffolded projects** — `create` bootstraps ORM `onRegister` hooks before calling `buildCompositionPlan`, so `registry.orm.buildSchemaFiles()` has an active provider.
+- **`foundation generate crud` no longer crashes** — `tsType`/`pyType` were called as EJS variables but never injected into scope (ReferenceError). Both functions are now in the template variable map.
+- **`FileEntry.when` conditions evaluated** — `{ when: "deployment.docker" }` now correctly gates file inclusion against user selections. Previously all files were always included.
+- **`foundation generate` ORM bootstrap scoped** — Only `orm`-category modules fire `onRegister` during generate. Previously all installed modules re-fired hooks, risking double-execution of non-idempotent hooks.
+- **`globals.css` duplicate path** — `ui-shadcn` now declares `overwrite: true` on `src/app/globals.css`, resolving the `DuplicateFilePathError` when combining Next.js + ShadCN.
+- **Python install on 3.11+** — `installPythonDependencies` creates a `.venv` before running pip, fixing PEP 668 "externally-managed-environment" errors.
+- **`FOUNDATION_CLI_VERSION`** — Read from `package.json` at runtime instead of hardcoded `"0.0.1"`.
+- **Dropped selections now warn** — `selectionsToModuleIds` writes a `stderr` warning instead of silently omitting a module with no match.
+
+### Changed
+
+- **Archetypes differentiated** — `ai-app` (TanStack Query), `ecommerce` (session auth, ShadCN, Zustand), `crm` (NestJS, OAuth, MUI, Redux), `dashboard` (ShadCN, TanStack Query, Vercel) now have distinct stacks.
+- **Stripe plugin populated** — `foundation add stripe` now writes real webhook handler, client, and type files instead of empty stubs.
+- **`parseLockfile` hardened** — Per-field type guards on `modules[].id` and `modules[].version`; malformed entries are skipped rather than poisoning the array.
+- **`requiremenets-merge.ts` renamed** — Corrected to `requirements-merge.ts`.
+- **`tsup.config.ts`** — `worker-host.ts` added as a separate build entry so it emits as `dist/sandbox/worker-host.js`.
+
+### Breaking Changes
+
+- `SandboxLogger` type removed from `@systemlabs/foundation-core` exports (was unused by all built-in modules).
+- `buildCompositionPlan(orderedModules, orm?)` signature extended to `buildCompositionPlan(orderedModules, orm?, selections?)`. Existing callers with two args are unaffected.
+
+### Packages published
+
+- `@systemlabs/foundation-cli@0.3.0`
+- `@systemlabs/foundation-core@0.3.0`
+- `@systemlabs/foundation-modules@0.3.0`
+- `@systemlabs/foundation-plugin-sdk@0.3.0`
+- `@systemlabs/foundation-testing@0.3.0`
+
+---
+
 ## [0.2.1] — 2025-03-15
 
 ### Added
@@ -76,5 +120,7 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
-[Unreleased]: https://github.com/ronak-create/Foundation-Cli/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/ronak-create/Foundation-Cli/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/ronak-create/Foundation-Cli/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/ronak-create/Foundation-Cli/compare/v0.1.0...v0.2.1
 [0.1.0]: https://github.com/ronak-create/Foundation-Cli/releases/tag/v0.1.0

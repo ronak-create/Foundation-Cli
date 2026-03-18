@@ -239,6 +239,14 @@ export function selectionsToModuleIds(
   return selections
     .filter((s) => s !== "none")
     .map((s) => SELECTION_TO_MODULE_ID[s] ?? s)
-    .filter((id) => registry.hasModule(id));
+    .filter((id) => {
+      if (!registry.hasModule(id)) {
+        process.stderr.write(
+          `  ⚠  Selection "${id}" has no registered module — skipped. ` +
+          `The generated project will not include this component.\n`,
+        );
+        return false;
+      }
+      return true;
+    });
 }
-

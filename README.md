@@ -171,12 +171,12 @@ Start with battle-tested defaults. All selections can be overridden interactivel
 | Archetype | Frontend | Backend | Database | Auth | UI | Deploy |
 |-----------|----------|---------|----------|------|----|--------|
 | `saas` | Next.js | Express | PostgreSQL | JWT | Tailwind | Docker |
-| `ai-app` | Next.js | Express | PostgreSQL | JWT | Tailwind | Docker |
-| `ecommerce` | Next.js | Express | PostgreSQL | JWT | Tailwind | Docker |
+| `ai-app` | Next.js | Express | PostgreSQL | JWT | Tailwind + TanStack Query | Docker |
+| `ecommerce` | Next.js | Express | PostgreSQL | Session | ShadCN + Zustand | Docker |
 | `api-backend` | None | Express | PostgreSQL | JWT | None | Docker |
 | `internal-tool` | Next.js | Express | PostgreSQL | JWT | Tailwind | None |
-| `crm` | Next.js | Express | PostgreSQL | JWT | Tailwind | Docker |
-| `dashboard` | Next.js | Express | PostgreSQL | JWT | Tailwind | Docker |
+| `crm` | Next.js | NestJS | PostgreSQL | OAuth | MUI + Redux | Docker |
+| `dashboard` | Next.js | Express | PostgreSQL | JWT | ShadCN + TanStack Query | Vercel |
 
 ---
 

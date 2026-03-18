@@ -93,7 +93,7 @@ Every module below generates **real, compile-ready files** — not stubs or plac
 
 | Plugin | Install command | What it adds |
 |--------|----------------|--------------|
-| Stripe | `foundation add stripe` | Stripe client, webhook handler, env config |
+| Stripe | `foundation add stripe` | Stripe client singleton, webhook handler with event routing, type exports |
 | Redis | `foundation add redis` | Redis client with connection helpers |
 | OpenAI | `foundation add openai` | OpenAI client with typed completions helper |
 
@@ -106,8 +106,8 @@ Pick an archetype with `--preset` and every module is pre-selected with battle-t
 | Archetype | Frontend | Backend | Database | Auth | UI | Deploy |
 |-----------|----------|---------|----------|------|----|--------|
 | `saas` | Next.js | Express | PostgreSQL | JWT | Tailwind | Docker |
-| `ai-app` | Next.js | Express | PostgreSQL | JWT | Tailwind | Docker |
-| `ecommerce` | Next.js | Express | PostgreSQL | JWT | Tailwind | Docker |
+| `ai-app` | Next.js | Express | PostgreSQL | JWT | Tailwind + TanStack Query | Docker |
+| `ecommerce` | Next.js | Express | PostgreSQL | Session | ShadCN + Zustand | Docker |
 | `api-backend` | None | Express | PostgreSQL | JWT | None | Docker |
 | `internal-tool` | Next.js | Express | PostgreSQL | JWT | Tailwind | None |
 

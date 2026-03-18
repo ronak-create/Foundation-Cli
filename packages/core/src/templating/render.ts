@@ -24,13 +24,16 @@ export function renderTemplate(
 ): string {
   try {
     return ejs.render(templateString, variables, {
-      // Disable file includes for security — templates are in-memory only.
+      // Disable file includes — templates are in-memory only.
       root: undefined,
       views: [],
-      // Strict mode: accessing undefined variables throws.
+      // strict: false allows undefined variables to render as empty string.
       strict: false,
-      // rmWhitespace: false keeps intentional whitespace in generated files.
       rmWhitespace: false,
+      // Identity escape: Foundation generates source code (TS, Python, YAML),
+      // not HTML. The default ejs.escapeXML would turn o'reilly → o&#39;reilly
+      // inside .ts files, producing compilation errors.
+      escape: (str: unknown) => String(str ?? ""),
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

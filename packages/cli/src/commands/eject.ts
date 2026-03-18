@@ -15,6 +15,7 @@ import fs from "node:fs/promises";
 import chalk from "chalk";
 import {
   ModuleRegistry,
+  FileTransaction,
   readProjectState,
   isFoundationProject,
   FOUNDATION_DIR,
@@ -101,20 +102,38 @@ export async function runEjectCommand(args: ReadonlyArray<string>): Promise<void
     const { manifest } = plugin;
     process.stdout.write(`\n  ${chalk.bold(manifest.name)} (${moduleId})\n`);
 
-    let ejectedCount = 0;
+    // Collect which files already exist (for display labels) before staging.
+    const existenceMap = new Map<string, boolean>();
     for (const fileEntry of manifest.files) {
       const destAbs = path.join(cwd, fileEntry.relativePath);
-
-      // Check for conflicts — warn but overwrite (user explicitly chose to eject)
-      let existed = false;
       try {
         await fs.access(destAbs);
-        existed = true;
-      } catch { /* file does not exist yet */ }
+        existenceMap.set(fileEntry.relativePath, true);
+      } catch {
+        existenceMap.set(fileEntry.relativePath, false);
+      }
+    }
 
-      await fs.mkdir(path.dirname(destAbs), { recursive: true });
-      await fs.writeFile(destAbs, fileEntry.content, "utf-8");
+    // Atomic write via FileTransaction — eject is all-or-nothing per module.
+    const txn = new FileTransaction({ projectRoot: cwd });
+    await txn.open();
+    try {
+      for (const fileEntry of manifest.files) {
+        await txn.stage(fileEntry.relativePath, fileEntry.content);
+      }
+      await txn.commit();
+    } catch (err) {
+      await txn.rollback().catch(() => undefined);
+      process.stderr.write(
+        chalk.red(`  ✖  Failed to eject "${moduleId}": `) +
+        chalk.dim(err instanceof Error ? err.message : String(err)) + "\n",
+      );
+      continue;
+    }
 
+    let ejectedCount = 0;
+    for (const fileEntry of manifest.files) {
+      const existed = existenceMap.get(fileEntry.relativePath) ?? false;
       const label = existed ? chalk.yellow("overwrite") : chalk.green("create");
       process.stdout.write(`    ${label}  ${fileEntry.relativePath}\n`);
       ejectedCount++;

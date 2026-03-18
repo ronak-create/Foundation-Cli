@@ -175,4 +175,3 @@ function mergeConstraints(name: string, a: string, b: string): string {
   }
   return partsA.join(",");
 }
-

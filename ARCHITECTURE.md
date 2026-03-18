@@ -54,7 +54,7 @@ The **engine**. No CLI dependencies — it can be embedded in other tools. Conta
 |-----------|----------|------|
 | Module Registry | `src/module-registry/` | Loads, validates, and indexes modules |
 | Dependency Resolver | `src/dependency-resolver/` | Capability-based DAG resolution + topological sort |
-| Composition Planner | `src/composition/` | Merges file trees, produces an `ExecutionPlan` |
+| Composition Planner | `src/composition/` | Merges file trees, evaluates `FileEntry.when` conditions, produces an `ExecutionPlan` |
 | Execution Pipeline | `src/execution/` | Runs 14 hooks, writes files, installs packages |
 | ORM Service | `src/orm/` | Portable model layer; provider-specific code generation |
 | Generator Service | `src/generator/` | Registry of code generators invoked by `foundation generate` |
@@ -129,7 +129,8 @@ Dependency Resolver ─────────────────► Resol
       ▼
 Composition Planner ─────────────────► CompositionPlan
       │    Merges: file trees, configPatches, dependencies
-      │    ORM Service.buildSchemaFiles() ──► schema FileEntries injected here
+      │    Evaluates FileEntry.when conditions against SelectionMap
+      │    ORM Service.buildSchemaFiles() ──► schema FileEntries injected here (requires ORM onRegister hooks to have run first)
       │
       ▼
 Execution Pipeline ──────────────────► ExecutionPipelineResult
@@ -234,7 +235,7 @@ All 14 hooks defined in `PluginHooks` (`plugin-sdk/src/types.ts`):
 | `onStart` | When `foundation dev` runs | Dev-time setup |
 | `onBuild` | When `foundation build` runs | Build-time steps |
 
-Third-party plugin hooks execute in a sandboxed context (`core/src/sandbox/plugin-sandbox.ts`). Sandboxed hooks cannot access arbitrary filesystem paths outside `projectRoot` (enforced by `safeResolve`).
+Third-party plugin hooks execute in an isolated `worker_threads` Worker (`core/src/sandbox/plugin-sandbox.ts` + `worker-host.ts`). Each hook runs in a physically separate V8 context — there is no shared reference to the parent's `process`, `require`, or module cache. Module-blocking is enforced inside the worker via a `require` interceptor. Sandboxed hooks cannot access filesystem paths outside `projectRoot` (enforced by `safeResolve`).
 
 ---
 

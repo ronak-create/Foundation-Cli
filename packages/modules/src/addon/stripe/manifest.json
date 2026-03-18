@@ -3,16 +3,24 @@
   "name": "Stripe Payments",
   "version": "1.0.0",
   "description": "Stripe payment processing integration with webhook support and type-safe API helpers",
-  "category": "tooling",
+  "category": "addon",
   "runtime": "node",
   "dependencies": [
-    { "name": "stripe", "version": "^15.7.0", "scope": "dependencies" },
-    { "name": "@types/stripe", "version": "^8.0.417", "scope": "devDependencies" }
+    { "name": "stripe", "version": "^15.7.0", "scope": "dependencies" }
   ],
   "files": [
-    { "relativePath": "src/payments/stripe.ts", "content": "" },
-    { "relativePath": "src/payments/stripe-webhooks.ts", "content": "" },
-    { "relativePath": "src/payments/stripe-types.ts", "content": "" }
+    {
+      "relativePath": "src/payments/stripe.ts",
+      "content": "import Stripe from 'stripe';\n\nconst key = process.env['STRIPE_SECRET_KEY'];\nif (!key) throw new Error('STRIPE_SECRET_KEY environment variable is not set.');\n\nexport const stripe = new Stripe(key, {\n  apiVersion: '2024-04-10',\n  typescript: true,\n});\n"
+    },
+    {
+      "relativePath": "src/payments/stripe-webhooks.ts",
+      "content": "import type { Request, Response } from 'express';\nimport { stripe } from './stripe.js';\n\n/**\n * Express handler for the Stripe webhook endpoint.\n * Mount with: app.post('/webhooks/stripe', express.raw({ type: 'application/json' }), handleStripeWebhook)\n */\nexport async function handleStripeWebhook(req: Request, res: Response): Promise<void> {\n  const sig = req.headers['stripe-signature'];\n  const secret = process.env['STRIPE_WEBHOOK_SECRET'];\n\n  if (!sig || !secret) {\n    res.status(400).send('Missing Stripe signature or webhook secret.');\n    return;\n  }\n\n  let event: import('stripe').Stripe.Event;\n  try {\n    event = stripe.webhooks.constructEvent(req.body as Buffer, sig, secret);\n  } catch (err) {\n    const message = err instanceof Error ? err.message : String(err);\n    res.status(400).send(`Webhook signature verification failed: ${message}`);\n    return;\n  }\n\n  // Route events to handlers\n  switch (event.type) {\n    case 'checkout.session.completed': {\n      // const session = event.data.object;\n      // TODO: fulfil the purchase\n      break;\n    }\n    case 'customer.subscription.deleted': {\n      // const subscription = event.data.object;\n      // TODO: revoke access\n      break;\n    }\n    default:\n      // Unhandled event type — safe to ignore\n      break;\n  }\n\n  res.json({ received: true });\n}\n"
+    },
+    {
+      "relativePath": "src/payments/stripe-types.ts",
+      "content": "export type { Stripe } from 'stripe';\n\n/** Common Stripe event types used in webhook handlers. */\nexport type StripeEventType =\n  | 'checkout.session.completed'\n  | 'customer.subscription.created'\n  | 'customer.subscription.updated'\n  | 'customer.subscription.deleted'\n  | 'invoice.payment_succeeded'\n  | 'invoice.payment_failed';\n\nexport type StripeWebhookEvent = import('stripe').Stripe.Event;\n"
+    }
   ],
   "configPatches": [
     {
@@ -25,5 +33,6 @@
     }
   ],
   "compatibility": { "requires": [], "conflicts": [] },
+  "postInstallInstructions": "Stripe plugin installed. Next: add keys to .env, then run: stripe listen --forward-to localhost:3001/webhooks/stripe",
   "tags": ["payments", "stripe", "billing", "webhooks"]
 }

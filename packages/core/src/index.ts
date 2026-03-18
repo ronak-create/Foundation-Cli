@@ -68,8 +68,10 @@ export {
 // ── Module Registry ───────────────────────────────────────────────────────────
 export {
   ModuleRegistry,
+  makeRegistryAccessor,
   loadPluginsFromProject,
   type ModuleSource,
+  type RegistryAccessor,
 } from "./module-registry/registry.js";
 export { loadModulesFromDirectory } from "./module-registry/loader.js";
 
@@ -165,7 +167,6 @@ export {
   SandboxBlockedModuleError,
   SandboxTimeoutError,
   BLOCKED_MODULES,
-  type SandboxLogger,
   type SandboxHookOptions,
 } from "./sandbox/index.js";
 
