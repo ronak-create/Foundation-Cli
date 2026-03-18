@@ -8,6 +8,7 @@
 
 import { Worker } from "node:worker_threads";
 import { fileURLToPath } from "node:url";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { FoundationError } from "../errors.js";
 import type { PluginHookContext } from "@systemlabs/foundation-plugin-sdk";
@@ -65,41 +66,28 @@ const DEFAULT_HOOK_TIMEOUT_MS = 5_000;
 // ── Worker host resolution ────────────────────────────────────────────────────
 
 function resolveWorkerHostPath(): string {
+  // worker-host MUST be loaded as a compiled .js file.
+  // Node cannot execute .ts files as Workers — Workers bypass vitest's transform.
+  // tsup emits: src/sandbox/worker-host.ts → dist/sandbox/worker-host.js
+  //
+  // Walk up from this file to find the package root (dir with package.json),
+  // then return dist/sandbox/worker-host.js — works for both vitest source runs
+  // (import.meta.url = src/sandbox/plugin-sandbox.ts) and production bundles
+  // (import.meta.url = dist/index.js).
   const thisFile = fileURLToPath(import.meta.url);
-  const thisDir = path.dirname(thisFile);
+  let dir = path.dirname(thisFile);
 
-  // In compiled output, tsup emits worker-host.ts as:
-  //   dist/sandbox/worker-host.js
-  // plugin-sandbox.ts is compiled to dist/sandbox/plugin-sandbox.js (bundled
-  // into dist/index.js but import.meta.url points to the original source location
-  // during vitest runs or to dist/index.js during production).
-  //
-  // Resolution strategy:
-  //   - If this file ends in .ts (vitest running source), look for worker-host.ts
-  //     in the same directory.
-  //   - If this file is dist/index.js (tsup bundle), the worker is at
-  //     dist/sandbox/worker-host.js — one level up from index.js plus subdir.
-  //   - If this file is dist/sandbox/plugin-sandbox.js (hypothetical separate
-  //     entry), the worker is in the same directory.
-  //
-  // Simplest robust approach: check candidate paths in order.
-  const isTsSource = thisFile.endsWith(".ts");
-
-  if (isTsSource) {
-    // vitest source run: worker-host.ts is in the same sandbox/ directory
-    return path.join(thisDir, "worker-host.ts");
+  for (let i = 0; i < 8; i++) {
+    if (existsSync(path.join(dir, "package.json"))) {
+      return path.join(dir, "dist", "sandbox", "worker-host.js");
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
   }
 
-  // Compiled: tsup outputs worker-host as dist/sandbox/worker-host.js
-  // thisFile is dist/index.js → thisDir is dist/
-  // Or thisFile is dist/sandbox/worker-host.js → but that IS the worker itself
-  const candidateFromDist = path.join(thisDir, "sandbox", "worker-host.js");
-  const candidateFromSandbox = path.join(thisDir, "worker-host.js");
-
-  // Return whichever path is more likely based on current directory name
-  return path.basename(thisDir) === "sandbox"
-    ? candidateFromSandbox
-    : candidateFromDist;
+  // Last-resort fallback
+  return path.join(path.dirname(thisFile), "sandbox", "worker-host.js");
 }
 
 // ── Options ───────────────────────────────────────────────────────────────────
