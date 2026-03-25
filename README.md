@@ -6,6 +6,7 @@
 [![license](https://img.shields.io/github/license/ronak-create/Foundation-Cli?style=flat-square&color=10b981)](./LICENSE)
 [![build](https://img.shields.io/github/actions/workflow/status/ronak-create/Foundation-Cli/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/ronak-create/Foundation-Cli/actions)
 [![pnpm](https://img.shields.io/badge/maintained%20with-pnpm-f69220?style=flat-square)](https://pnpm.io/)
+[![TypeScript](https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square)](https://www.typescriptlang.org/)
 
 ```bash
 npx @systemlabs/foundation-cli create my-app
@@ -14,6 +15,8 @@ npx @systemlabs/foundation-cli create my-app
 A senior developer should be able to go from zero to a running, linted, type-checked, database-connected app with auth in **under 3 minutes** — no manual config editing, no missing dependencies, no broken imports.
 
 ---
+
+  [![Watch the demo](./public/demo.gif)](./public/demo.mp4)
 
 ## What is this?
 
@@ -24,6 +27,47 @@ Foundation CLI is a **dependency-aware project assembler**. You describe your in
 - A code scaffolding tool (like Yeoman or Hygen)
 - A monorepo manager (like Nx or Turborepo) — though it can generate one
 - A deployment tool — it generates deployment config, not deploy artifacts
+
+---
+
+## Why Foundation CLI?
+ 
+| Feature | Foundation CLI | T3 Stack | create-next-app |
+|---|---|---|---|
+| Stack flexibility | Any combo (4 frontends, 4 backends, 5 DBs, 5 auth...) | Opinionated (Next.js + tRPC + Prisma only) | Next.js only |
+| Conflict detection | ✅ DAG-based resolver blocks incompatible modules | ❌ Fixed stack, no conflicts possible | ❌ No modules to conflict |
+| Existing project support | ✅ `foundation add stripe/redis/openai` | ❌ Init only | ❌ Init only |
+| Config merging | ✅ Deep merge: package.json, tsconfig, .env, docker-compose | ❌ Static copy | ❌ Static copy |
+| Atomic writes | ✅ Stage → commit, full rollback on failure | ❌ No rollback | ❌ No rollback |
+---
+
+## How it works
+![Engine Pipeline](./public/pipeline.png)
+
+---
+
+## 🚧 Status
+
+> Early-stage project — actively evolving
+
+### ✅ What works
+- Project generation (end-to-end)
+- Module resolution (frontend + backend + DB)
+- Presets (SaaS, AI app, API backend)
+- Code generation (models, CRUD)
+
+### ⚠️ Not production-ready yet
+- Plugin ecosystem (still stabilizing)
+- Some module combinations may have edge-case conflicts
+
+### 🛣️ Roadmap (short-term)
+- Improve module compatibility system
+- Expand plugin ecosystem
+- Better error diagnostics
+
+---
+
+> If you try it and hit issues, please open an issue — feedback directly shapes the project.
 
 ---
 
@@ -71,6 +115,28 @@ foundation create my-app
   ▸ Frontend   http://localhost:3000
   ▸ Backend    http://localhost:3001
 ```
+
+---
+
+## Example Output (Generated Project)
+
+Here’s what Foundation CLI generates out of the box:
+
+### Generated .env
+
+![env](./examples/generated-env.png)
+
+### Generated package.json
+
+![package](./examples/generated-package.png)
+
+### Project Structure
+
+![structure](./examples/root-dir.png)
+
+### Generated README
+
+![readme](./examples/generated-readme.png)
 
 ---
 
@@ -146,6 +212,9 @@ foundation ai "create a blog with posts, comments, and JWT auth"
 
 ---
 
+## Module Ecosystem
+![Module Ecosystem](./public/modules.png)
+
 ## Available modules
 
 See [MODULES.md](./MODULES.md) for the full per-module reference — every file generated, every dependency installed, and the compatibility matrix.
@@ -171,12 +240,12 @@ Start with battle-tested defaults. All selections can be overridden interactivel
 | Archetype | Frontend | Backend | Database | Auth | UI | Deploy |
 |-----------|----------|---------|----------|------|----|--------|
 | `saas` | Next.js | Express | PostgreSQL | JWT | Tailwind | Docker |
-| `ai-app` | Next.js | Express | PostgreSQL | JWT | Tailwind + TanStack Query | Docker |
-| `ecommerce` | Next.js | Express | PostgreSQL | Session | ShadCN + Zustand | Docker |
+| `ai-app` | Next.js | Express | PostgreSQL | JWT | Tailwind | TanStack Query | Docker |
+| `ecommerce` | Next.js | Express | PostgreSQL | Session | ShadCN | Zustand | Docker |
 | `api-backend` | None | Express | PostgreSQL | JWT | None | Docker |
 | `internal-tool` | Next.js | Express | PostgreSQL | JWT | Tailwind | None |
-| `crm` | Next.js | NestJS | PostgreSQL | OAuth | MUI + Redux | Docker |
-| `dashboard` | Next.js | Express | PostgreSQL | JWT | ShadCN + TanStack Query | Vercel |
+| `crm` | Next.js | NestJS | PostgreSQL | OAuth | MUI | Redux | Docker |
+| `dashboard` | Next.js | Express | PostgreSQL | JWT | ShadCN | TanStack Query | Vercel |
 
 ---
 
@@ -223,6 +292,9 @@ A plugin is a standard npm package with the `foundation-plugin` keyword. Plugin 
 | Official | Maintained by the Foundation CLI org |
 
 ---
+
+## Monorepo Architecture
+![Monorepo](./public/monorepo.png)
 
 ## Monorepo packages
 
@@ -316,6 +388,12 @@ Release notes are published on [GitHub Releases](https://github.com/ronak-create
 | Monorepo | `pnpm` + `turbo` |
 
 ---
+
+## Featured
+
+<a href="https://forg.to/products/foundation-cli" target="_blank" rel="noopener">
+  <img src="https://forg.to/api/badges/featured/foundation-cli?theme=dark&shape=rounded" alt="Foundation Cli - Featured on Forg on forg." height="48" />
+</a>
 
 ## License
 

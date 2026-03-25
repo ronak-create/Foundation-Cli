@@ -1,0 +1,32 @@
+{
+  "foundationCliVersion": "0.0.0-unknown",
+  "generatedAt": "2026-03-24T18:23:37.888Z",
+  "packageManager": "npm",
+  "modules": [
+    {
+      "id": "auth-jwt",
+      "version": "1.0.0"
+    },
+    {
+      "id": "backend-express",
+      "version": "1.0.0"
+    },
+    {
+      "id": "database-postgresql",
+      "version": "1.0.0"
+    },
+    {
+      "id": "deployment-docker",
+      "version": "1.0.0"
+    },
+    {
+      "id": "frontend-nextjs",
+      "version": "1.0.0"
+    },
+    {
+      "id": "ui-tailwind",
+      "version": "1.0.0"
+    }
+  ],
+  "plugins": []
+}

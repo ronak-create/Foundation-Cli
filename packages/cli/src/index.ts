@@ -7,22 +7,22 @@
 //   - foundation create-plugin [name]
 //   - foundation create --preset <archetype>   (CI / non-interactive mode)
 
-import { runCreateCommand }       from "./commands/create.js";
-import { runAddCommand }          from "./commands/add.js";
-import { runSearchCommand }       from "./commands/search.js";
-import { runPluginsCommand }      from "./commands/plugins.js";
-import { runEjectCommand }        from "./commands/eject.js";
-import { runUpgradeCommand }      from "./commands/upgrade.js";
-import { runValidateCommand }     from "./commands/validate.js";
+import { runCreateCommand } from "./commands/create.js";
+import { runAddCommand } from "./commands/add.js";
+import { runSearchCommand } from "./commands/search.js";
+import { runPluginsCommand } from "./commands/plugins.js";
+import { runEjectCommand } from "./commands/eject.js";
+import { runUpgradeCommand } from "./commands/upgrade.js";
+import { runValidateCommand } from "./commands/validate.js";
 import { runCreatePluginCommand } from "./commands/create-plugin.js";
-import { runInfoCommand }         from "./commands/info.js";
-import { runDoctorCommand }       from "./commands/doctor.js";
+import { runInfoCommand } from "./commands/info.js";
+import { runDoctorCommand } from "./commands/doctor.js";
 import { runDevCommand, runDbCommand, runTestCommand } from "./commands/dev.js";
-import { runGenerateCommand }     from "./commands/generate.js";
-import { runSwitchCommand }       from "./commands/switch.js";
-import { runAiCommand }           from "./commands/ai.js";
-import { printError }             from "./ui/renderer.js";
-import chalk      from "chalk";
+import { runGenerateCommand } from "./commands/generate.js";
+import { runSwitchCommand } from "./commands/switch.js";
+import { runAiCommand } from "./commands/ai.js";
+import { printError } from "./ui/renderer.js";
+import chalk from "chalk";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -99,7 +99,26 @@ export async function run(args: ReadonlyArray<string>): Promise<void> {
 
   switch (command) {
     case undefined:
-    case "create":
+    case "create": {
+      const presetIdx = rest.indexOf("--preset");
+
+      let preset: string | undefined;
+
+      if (presetIdx !== -1) {
+        preset = rest[presetIdx + 1];
+
+        if (!preset || preset.startsWith("--")) {
+          console.error("Error: --preset requires a value (e.g. saas)");
+          process.exit(1);
+        }
+      }
+
+      const options: { preset?: string } = {};
+      if (preset !== undefined) options.preset = preset;
+
+      await runCreateCommand(options);
+      break;
+    }
     case "new":
       await runCreateCommand();
       break;

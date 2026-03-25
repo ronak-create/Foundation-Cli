@@ -19,7 +19,7 @@ import chalk from "chalk";
 import { runPromptGraph, type SelectionMap } from "./graph.js";
 import { buildFoundationGraph } from "./graph-definition.js";
 import { inquirerAdapter } from "./adapter.js";
-import { getArchetype } from "./archetypes.js";
+import { ARCHETYPES, getArchetype } from "./archetypes.js";
 import { printBanner, printSection, printSummaryTable, printAbort } from "../ui/renderer.js";
 import type { ModuleRegistry } from "@systemlabs/foundation-core";
 import { collectCredentials, type CollectedCredentials } from "./credential-collector.js";
@@ -167,6 +167,7 @@ export async function runPromptFlow(
     registry,
     ciMode = false,
     allowExperimental = false,
+    preset
   } = options;
   printBanner();
 
@@ -182,7 +183,17 @@ export async function runPromptFlow(
   // section-boundary node.
   const instrumentedAdapter = withSectionHeaders(adapter);
 
-  const answers: SelectionMap = await runPromptGraph(graph, instrumentedAdapter);
+  function applyPresetDefaults(preset: string): SelectionMap {
+  const archetype = getArchetype(preset);
+  if (!archetype) throw new Error(`Unknown preset "${preset}". Available: ${Object.keys(ARCHETYPES).join(", ")}`);
+  return { ...archetype.defaults, projectName: "my-app", projectType: preset };
+}
+  // const { adapter = inquirerAdapter, ciMode = false, allowExperimental = false, preset } = options;
+
+  // then replace runPromptGraph with:
+  const answers: SelectionMap = preset
+    ? applyPresetDefaults(preset) // skip interactive prompts
+    : await runPromptGraph(graph, instrumentedAdapter);
 
   // ── 2. Build RawSelections from SelectionMap ───────────────────────────────
   const rawSelections: RawSelections = {

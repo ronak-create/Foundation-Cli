@@ -1,0 +1,14 @@
+{
+  "projectName": "my-app",
+  "createdAt": "2026-03-24T18:23:37.888Z",
+  "selections": {
+    "frontend": "nextjs",
+    "backend": "express",
+    "database": "postgresql",
+    "auth": "jwt",
+    "ui": "tailwind",
+    "stateManagement": "none",
+    "deployment": "docker"
+  },
+  "plugins": []
+}
