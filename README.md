@@ -389,6 +389,12 @@ Release notes are published on [GitHub Releases](https://github.com/ronak-create
 
 ---
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/image?repos=ronak-create/Foundation-Cli&type=date&legend=top-left)](https://www.star-history.com/?repos=ronak-create%2FFoundation-Cli&type=date&legend=top-left)
+
+---
+
 ## Featured
 
 <a href="https://forg.to/products/foundation-cli" target="_blank" rel="noopener">
