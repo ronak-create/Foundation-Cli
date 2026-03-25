@@ -24,11 +24,9 @@ Thank you for your interest in contributing. This document covers everything you
 
 ---
 
-## Code of conduct
+## Code of Conduct
 
-This project follows the [Contributor Covenant v2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/). Be respectful, constructive, and welcoming. Harassment or discrimination of any kind will not be tolerated.
-
----
+For detailed Code of Conduct refer at : [CODE OF CONDUCT](./CODE_OF_CONDUCT.md)
 
 ## Getting started
 
