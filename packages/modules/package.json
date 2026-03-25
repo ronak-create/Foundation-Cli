@@ -1,7 +1,7 @@
 {
   "name": "@systemlabs/foundation-modules",
   "description": "Built-in modules for databases, backends, auth providers, and services.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "MIT",
   "repository": {
     "type": "git",
