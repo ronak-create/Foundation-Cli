@@ -27,7 +27,7 @@ jobs:
         run: |
           cd docs
           pnpm install --no-frozen-lockfile
-          pnpm exec astro build
+          pnpm build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
