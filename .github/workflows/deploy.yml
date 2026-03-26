@@ -13,10 +13,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: docs   # 👈 KEY FIX
-
     steps:
       - uses: actions/checkout@v4
 
@@ -28,11 +24,11 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Install deps
-        run: pnpm install --no-frozen-lockfile
+      - name: Install deps (docs only)
+        run: pnpm install --no-frozen-lockfile --dir docs
 
       - name: Build docs
-        run: pnpm build
+        run: pnpm --dir docs exec astro build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
