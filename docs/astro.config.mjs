@@ -2,7 +2,7 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 
 export default defineConfig({
-  site: "https://ronak-create.github.io",
+  site: "https://ronak-create.github.io/Foundation-Cli",
   base: "/Foundation-Cli/docs",
   integrations: [
     starlight({
