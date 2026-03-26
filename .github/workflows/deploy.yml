@@ -24,19 +24,14 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Install docs deps (ISOLATED)
-        run: |
-          cd docs
-          rm -f ../pnpm-lock.yaml
-          pnpm install
+      - name: Install deps
+        run: pnpm install --shamefully-hoist
 
       - name: Build docs
-        run: |
-          cd docs
-          pnpm build
+        run: pnpm --filter foundation-cli-docs build
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: docs/dist
 
