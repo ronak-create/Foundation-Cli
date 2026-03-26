@@ -10,7 +10,6 @@ export default defineConfig({
       title: "Foundation CLI",
       description: "A modular project composition engine with a plugin ecosystem",
       pagefind: false,
-      sitemap(),
       social: {
         github: "https://github.com/ronak-create/Foundation-Cli",
       },
@@ -127,5 +126,6 @@ export default defineConfig({
       ],
       customCss: ["./src/styles/custom.css"],
     }),
+    sitemap(),
   ],
 });
