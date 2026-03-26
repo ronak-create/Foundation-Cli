@@ -8,7 +8,7 @@ export default defineConfig({
     starlight({
       title: "Foundation CLI",
       description: "A modular project composition engine with a plugin ecosystem",
-      pagefind: true,  // Enable search indexing
+      pagefind: false,  // Enable search indexing
       social: {
         github: "https://github.com/ronak-create/Foundation-Cli",
       },
