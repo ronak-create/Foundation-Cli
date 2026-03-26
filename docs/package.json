@@ -1,0 +1,20 @@
+{
+  "name": "foundation-cli-docs",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "private": true,
+  "dependencies": {
+    "@astrojs/starlight": "^0.25.0",
+    "astro": "^4.8.6"
+  },
+  "overrides": {
+    "@astrojs/sitemap": "3.1.2"
+  }
+}

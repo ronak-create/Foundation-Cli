@@ -1,0 +1,78 @@
+---
+title: Welcome to Foundation CLI
+description: A modular project composition engine with a plugin ecosystem
+template: splash
+hero:
+  tagline: Build production-ready full-stack projects in under 3 minutes
+  actions:
+    - text: Quick Start
+      link: /Foundation-Cli/docs/getting-started/quick-start/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/ronak-create/Foundation-Cli
+      icon: external
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components";
+
+## Why Foundation CLI?
+
+<CardGrid stagger>
+  <Card title="Stack Flexibility" icon="open-book">
+    Choose from 4 frontends, 4 backends, 5 databases, 5 auth providers, and more. Any combination
+    works together.
+  </Card>
+  <Card title="Conflict Detection" icon="warning">
+    The DAG-based resolver automatically detects incompatible modules before they cause issues.
+  </Card>
+  <Card title="Config Merging" icon="setting">
+    Deep merge for package.json, tsconfig.json, .env, docker-compose — no more manual fixing.
+  </Card>
+  <Card title="Atomic Writes" icon="rocket">
+    Files are staged to temp dir and committed atomically. On failure, nothing reaches your disk.
+  </Card>
+</CardGrid>
+
+## Quick Example
+
+```bash
+# One-shot, no install needed
+npx @systemlabs/foundation-cli create my-saas
+
+# Or install globally
+npm install -g @systemlabs/foundation-cli
+foundation create my-saas --preset saas
+```
+
+## Available Modules
+
+| Category       | Options                                              |
+| -------------- | ---------------------------------------------------- |
+| **Frontend**   | Next.js · React + Vite · Vue 3 · Svelte              |
+| **Backend**    | Express · NestJS · FastAPI · Django                  |
+| **Database**   | PostgreSQL · MySQL · MongoDB · SQLite · Supabase     |
+| **ORM**        | Prisma · TypeORM · Mongoose · SQLAlchemy             |
+| **Auth**       | JWT · OAuth · Session · Clerk · Auth0                |
+| **UI**         | Tailwind · ShadCN · Material UI · Chakra · Bootstrap |
+| **State**      | Zustand · Redux Toolkit · TanStack Query             |
+| **Deployment** | Docker · Vercel · Render · AWS ECS                   |
+
+## Next Steps
+
+<div>
+  <ol>
+    <li>
+      <a href="/Foundation-Cli/docs/getting-started/installation/">Installation</a>
+    </li>
+    <li>
+      <a href="/Foundation-Cli/docs/getting-started/first-project/">First Project</a>
+    </li>
+    <li>
+      <a href="/Foundation-Cli/docs/tutorials/saas-app/">SaaS App Tutorial</a>
+    </li>
+    <li>
+      <a href="/Foundation-Cli/docs/cli/">CLI Reference</a>
+    </li>
+  </ol>
+</div>

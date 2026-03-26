@@ -10,3 +10,5 @@ coverage/
 *.log
 tmp/
 .cache/
+
+knowledge base/
