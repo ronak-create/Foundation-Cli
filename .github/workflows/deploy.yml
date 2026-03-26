@@ -12,22 +12,27 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: docs   # 👈 KEY FIX
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
       - name: Install pnpm
         run: npm install -g pnpm
 
+      - name: Install deps
+        run: pnpm install --no-frozen-lockfile
+
       - name: Build docs
-        run: |
-          cd docs
-          pnpm install --no-frozen-lockfile
-          pnpm build
+        run: pnpm build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
