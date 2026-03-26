@@ -24,11 +24,16 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Install deps (docs only)
-        run: pnpm install --no-frozen-lockfile --dir docs
+      - name: Install docs deps (ISOLATED)
+        run: |
+          cd docs
+          rm -f ../pnpm-lock.yaml
+          pnpm install
 
       - name: Build docs
-        run: pnpm --dir docs exec astro build
+        run: |
+          cd docs
+          npx astro build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
