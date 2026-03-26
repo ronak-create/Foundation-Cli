@@ -27,7 +27,7 @@ jobs:
         run: pnpm install
 
       - name: Build docs
-        run: pnpm --filter ./docs build
+        run: cd docs && pnpm install && pnpm build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
