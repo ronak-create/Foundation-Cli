@@ -56,7 +56,7 @@ Foundation CLI is a **dependency-aware project assembler**. You describe your in
 - Presets (SaaS, AI app, API backend)
 - Code generation (models, CRUD)
 
-### ⚠️ Not production-ready yet
+### ⚠️ Developing
 - Plugin ecosystem (still stabilizing)
 - Some module combinations may have edge-case conflicts
 
