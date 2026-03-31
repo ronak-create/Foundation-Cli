@@ -16,7 +16,11 @@ A senior developer should be able to go from zero to a running, linted, type-che
 
 ---
 
-  [![Watch the demo](./public/demo.gif)](./public/demo.mp4)
+<p align="center">
+  <a href="./public/demo.mp4">
+    <img src="./public/demo.gif" alt="Watch the demo" width="50%">
+  </a>
+</p>
 
 ## What is this?
 
