@@ -77,6 +77,8 @@ Foundation CLI is a **dependency-aware project assembler**. You describe your in
 
 ## Quick start
 
+**Requires Node 18 or newer** — check with `node --version`.
+
 ```bash
 # One-shot — no install needed
 npx @systemlabs/foundation-cli
